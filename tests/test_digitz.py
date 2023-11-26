@@ -96,7 +96,7 @@ def test_is_toll_free():
 
 def test_repr():
     num = PhoneNumber.from_string("+1 (202) 555-0192")
-    assert repr(num) == "<PhoneNumber +12025550192>"
+    assert repr(num) == "<PhoneNumber +1 202-555-0192>"
 
 
 def test_str():
