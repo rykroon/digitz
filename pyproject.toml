@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "digitz"
 dynamic = ["version"]
-description = 'Python phonenumbers made easy.'
+description = 'Python phone numbers made easy.'
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
@@ -27,9 +27,9 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/unknown/digitz#readme"
-Issues = "https://github.com/unknown/digitz/issues"
-Source = "https://github.com/unknown/digitz"
+Documentation = "https://github.com/rykroon/digitz#readme"
+Issues = "https://github.com/rykroon/digitz/issues"
+Source = "https://github.com/rykroon/digitz"
 
 [tool.hatch.version]
 path = "src/digitz/__about__.py"
