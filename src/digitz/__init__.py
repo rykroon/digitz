@@ -61,7 +61,7 @@ class PhoneNumber(pn.PhoneNumber):
         """
         from phonenumbers.geocoder import country_name_for_number
         return country_name_for_number(self, lang)
-    
+
     def get_description(self, lang="en") -> str:
         """Return the description of the phone number.
         Parameters:
@@ -105,14 +105,6 @@ class PhoneNumber(pn.PhoneNumber):
         """
         return self.number_type is PhoneNumberType.TOLL_FREE
 
-    def is_voip(self) -> bool:
-        """Return whether the phone number is voip.
-
-        Returns:
-            bool: Whether the phone number is voip.
-        """
-        return self.number_type is PhoneNumberType.VOIP
-    
     def to_string(self, format: PhoneNumberFormat = PhoneNumberFormat.E164) -> str:
         """Return the phone number as a string in the specified format.
 
@@ -170,16 +162,4 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             str: The phone number in International format.
         """
-        return f"<PhoneNumber {self.to_international()}>"
-
-
-def parse(string: str) -> PhoneNumber:
-    """Parse a phone number from a string.
-
-    Args:
-        string: The string to parse.
-
-    Returns:
-        A PhoneNumber object.
-    """
-    return PhoneNumber.from_string(string)
+        return f"<PhoneNumber: {self.to_international()}>"

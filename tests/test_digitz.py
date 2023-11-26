@@ -89,14 +89,9 @@ def test_is_toll_free():
     assert num.is_toll_free() is True
 
 
-# def test_is_voip():
-#     num = PhoneNumber.from_string("+1 (747) 555-0192")
-#     assert num.is_voip() is True
-
-
 def test_repr():
     num = PhoneNumber.from_string("+1 (202) 555-0192")
-    assert repr(num) == "<PhoneNumber +1 202-555-0192>"
+    assert repr(num) == "<PhoneNumber: +1 202-555-0192>"
 
 
 def test_str():
