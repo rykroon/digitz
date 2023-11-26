@@ -5,25 +5,25 @@ build-backend = "hatchling.build"
 [project]
 name = "digitz"
 dynamic = ["version"]
-description = ''
+description = 'Python phonenumbers made easy.'
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = "MIT"
 keywords = []
 authors = [
   { name = "Ryan Kroon", email = "rykroon.tech@gmail.com" },
 ]
 classifiers = [
-  "Development Status :: 4 - Beta",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
 dependencies = [
-  "phonenumbers>=8.*",
+  "phonenumbers==8.*",
 ]
 
 [project.urls]
@@ -34,25 +34,25 @@ Source = "https://github.com/unknown/digitz"
 [tool.hatch.version]
 path = "src/digitz/__about__.py"
 
-[tool.hatch.envs.default]
+[tool.hatch.envs.test]
 dependencies = [
   "coverage[toml]>=6.5",
   "pytest",
 ]
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
+
+[tool.hatch.envs.test.scripts]
+test = "coverage run -m pytest {args:tests}"
 cov-report = [
   "- coverage combine",
-  "coverage report",
+  "coverage report -m",
 ]
 cov = [
   "test-cov",
   "cov-report",
 ]
 
-[[tool.hatch.envs.all.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11"]
+[[tool.hatch.envs.test.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.coverage.run]
 source_pkgs = ["digitz", "tests"]

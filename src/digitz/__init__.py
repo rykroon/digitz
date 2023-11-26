@@ -32,6 +32,35 @@ class PhoneNumberType(Enum):
 
 class PhoneNumber(pn.PhoneNumber):
 
+    @classmethod
+    def from_string(cls, string: str) -> "PhoneNumber":
+        """Parse a phone number from a string.
+
+        Args:
+            string: The string to parse.
+
+        Returns:
+            A PhoneNumber object.
+        """
+        try:
+            obj = cls()
+            obj.merge_from(pn.parse(string))
+            return obj
+
+        except pn.NumberParseException as e:
+            if e.error_type == pn.NumberParseException.INVALID_COUNTRY_CODE:
+                raise InvalidCountryCode(e._msg) from e
+            elif e.error_type == pn.NumberParseException.NOT_A_NUMBER:
+                raise NotANumber(e._msg) from e
+            elif e.error_type == pn.NumberParseException.TOO_LONG:
+                raise TooLong(e._msg) from e
+            elif e.error_type == pn.NumberParseException.TOO_SHORT_AFTER_IDD:
+                raise TooShortAfterIDD(e._msg) from e
+            elif e.error_type == pn.NumberParseException.TOO_SHORT_NSN:
+                raise TooShortNsn(e._msg) from e
+            else:
+                raise
+
     @property
     def region_code(self) -> str:
         """Return the region code of the phone number.
@@ -40,9 +69,29 @@ class PhoneNumber(pn.PhoneNumber):
             str: The region code of the phone number.
         """
         return pn.region_code_for_country_code(self.country_code)
+    
+    def get_country_name(self, lang="en") -> str:
+        """Return the country name of the phone number.
+        Parameters:
+            lang: The language to use.
+        Returns:
+            The country name of the phone number.
+        """
+        from phonenumbers.geocoder import country_name_for_number
+        return country_name_for_number(self, lang)
+    
+    def get_description(self, lang="en") -> str:
+        """Return the description of the phone number.
+        Parameters:
+            lang: The language to use.
+        Returns:
+            The description of the phone number.
+        """
+        from phonenumbers.geocoder import description_for_number
+        return description_for_number(self, lang)
 
     @property
-    def type(self) -> str:
+    def number_type(self) -> str:
         """Return the type of phone number.
 
         Returns:
@@ -72,7 +121,15 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             bool: Whether the phone number is toll free.
         """
-        return self.type is PhoneNumberType.TOLL_FREE
+        return self.number_type is PhoneNumberType.TOLL_FREE
+
+    def is_voip(self) -> bool:
+        """Return whether the phone number is voip.
+
+        Returns:
+            bool: Whether the phone number is voip.
+        """
+        return self.number_type is PhoneNumberType.VOIP
 
     def to_e164(self) -> str:
         """Return the phone number in E.164 format.
@@ -123,30 +180,13 @@ class PhoneNumber(pn.PhoneNumber):
         return f"<PhoneNumber {self.to_e164()}>"
 
 
-def parse(string: str) -> str:
+def parse(string: str) -> PhoneNumber:
     """Parse a phone number from a string.
 
     Args:
-        string (str): The string to parse.
+        string: The string to parse.
 
     Returns:
-        str: The parsed phone number.
+        A PhoneNumber object.
     """
-    try:
-        obj = PhoneNumber()
-        obj.merge_from(pn.parse(string))
-        return obj
-
-    except pn.NumberParseException as e:
-        if e.error_type == pn.NumberParseException.INVALID_COUNTRY_CODE:
-            raise InvalidCountryCode from e
-        elif e.error_type == pn.NumberParseException.NOT_A_NUMBER:
-            raise NotANumber from e
-        elif e.error_type == pn.NumberParseException.TOO_LONG:
-            raise TooLong from e
-        elif e.error_type == pn.NumberParseException.TOO_SHORT_AFTER_IDD:
-            raise TooShortAfterIDD from e
-        elif e.error_type == pn.NumberParseException.TOO_SHORT_NSN:
-            raise TooShortNsn from e
-        else:
-            raise
+    return PhoneNumber.from_string(string)
