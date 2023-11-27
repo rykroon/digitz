@@ -4,7 +4,7 @@
 
 import phonenumbers as pn
 
-from .enums import PhoneNumberFormat, PhoneNumberType
+from .enums import PhoneNumberFormat, PhoneNumberType, NumberParseErrorType
 from .exceptions import (
     InvalidCountryCode,
     NotANumber,
@@ -15,12 +15,11 @@ from .exceptions import (
 
 
 class PhoneNumber(pn.PhoneNumber):
-
     @classmethod
-    def from_string(cls, string: str) -> "PhoneNumber":
+    def from_string(cls, string: str, /) -> "PhoneNumber":
         """Parse a phone number from a string.
 
-        Args:
+        Parameters:
             string: The string to parse.
 
         Returns:
@@ -30,15 +29,15 @@ class PhoneNumber(pn.PhoneNumber):
             return pn.parse(string, numobj=cls())
 
         except pn.NumberParseException as e:
-            if e.error_type == pn.NumberParseException.INVALID_COUNTRY_CODE:
+            if e.error_type == NumberParseErrorType.INVALID_COUNTRY_CODE:
                 raise InvalidCountryCode(e._msg) from e
-            elif e.error_type == pn.NumberParseException.NOT_A_NUMBER:
+            elif e.error_type == NumberParseErrorType.NOT_A_NUMBER:
                 raise NotANumber(e._msg) from e
-            elif e.error_type == pn.NumberParseException.TOO_LONG:
+            elif e.error_type == NumberParseErrorType.TOO_LONG:
                 raise TooLong(e._msg) from e
-            elif e.error_type == pn.NumberParseException.TOO_SHORT_AFTER_IDD:
+            elif e.error_type == NumberParseErrorType.TOO_SHORT_AFTER_IDD:
                 raise TooShortAfterIDD(e._msg) from e
-            elif e.error_type == pn.NumberParseException.TOO_SHORT_NSN:
+            elif e.error_type == NumberParseErrorType.TOO_SHORT_NSN:
                 raise TooShortNsn(e._msg) from e
             else:
                 raise
@@ -52,7 +51,7 @@ class PhoneNumber(pn.PhoneNumber):
         """
         return pn.region_code_for_country_code(self.country_code)
 
-    def get_country_name(self, lang="en") -> str:
+    def get_country_name(self, lang: str = "en") -> str:
         """Return the country name of the phone number.
         Parameters:
             lang: The language to use.
@@ -60,9 +59,10 @@ class PhoneNumber(pn.PhoneNumber):
             The country name of the phone number.
         """
         from phonenumbers.geocoder import country_name_for_number
+
         return country_name_for_number(self, lang)
 
-    def get_description(self, lang="en") -> str:
+    def get_description(self, lang: str = "en") -> str:
         """Return the description of the phone number.
         Parameters:
             lang: The language to use.
@@ -70,6 +70,7 @@ class PhoneNumber(pn.PhoneNumber):
             The description of the phone number.
         """
         from phonenumbers.geocoder import description_for_number
+
         return description_for_number(self, lang)
 
     @property
@@ -109,7 +110,7 @@ class PhoneNumber(pn.PhoneNumber):
         """Return the phone number as a string in the specified format.
 
         Parameters:
-            format: The format to use.
+            format: The format to use. Defaults to E.164.
 
         Returns:
             str: The phone number in the specified format.
@@ -162,4 +163,4 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             str: The phone number in International format.
         """
-        return f"<PhoneNumber: {self.to_international()}>"
+        return f"<{self.__class__.__name__}: {self.to_international()}>"

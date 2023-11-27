@@ -1,4 +1,3 @@
-
 from enum import IntEnum
 import phonenumbers as pn
 
@@ -27,3 +26,13 @@ class PhoneNumberFormat(IntEnum):
     INTERNATIONAL = pn.PhoneNumberFormat.INTERNATIONAL
     NATIONAL = pn.PhoneNumberFormat.NATIONAL
     RFC3966 = pn.PhoneNumberFormat.RFC3966
+
+
+class NumberParseErrorType(IntEnum):
+    """Enum for phone number parsing error types."""
+
+    INVALID_COUNTRY_CODE = pn.NumberParseException.INVALID_COUNTRY_CODE
+    NOT_A_NUMBER = pn.NumberParseException.NOT_A_NUMBER
+    TOO_SHORT_AFTER_IDD = pn.NumberParseException.TOO_SHORT_AFTER_IDD
+    TOO_SHORT_NSN = pn.NumberParseException.TOO_SHORT_NSN
+    TOO_LONG = pn.NumberParseException.TOO_LONG

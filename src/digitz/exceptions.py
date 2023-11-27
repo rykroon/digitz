@@ -1,9 +1,11 @@
 from phonenumbers import NumberParseException
+from .enums import NumberParseErrorType
 
 
 class InvalidCountryCode(NumberParseException):
     """Raised when the country code is invalid."""
-    error_type = NumberParseException.INVALID_COUNTRY_CODE
+
+    error_type = NumberParseErrorType.INVALID_COUNTRY_CODE
 
     def __init__(self, msg: str):
         super().__init__(self.error_type, msg)
@@ -11,7 +13,8 @@ class InvalidCountryCode(NumberParseException):
 
 class NotANumber(NumberParseException):
     """Raised when the string is not a number."""
-    error_type = NumberParseException.NOT_A_NUMBER
+
+    error_type = NumberParseErrorType.NOT_A_NUMBER
 
     def __init__(self, msg: str):
         super().__init__(self.error_type, msg)
@@ -19,23 +22,30 @@ class NotANumber(NumberParseException):
 
 class TooLong(NumberParseException):
     """Raised when the number is too long."""
-    error_type = NumberParseException.TOO_LONG
+
+    error_type = NumberParseErrorType.TOO_LONG
 
     def __init__(self, msg: str):
         super().__init__(self.error_type, msg)
 
 
-class TooShortAfterIDD(NumberParseException):
+class TooShort(NumberParseException):
+    """Raised when the number is too short."""
+
+
+class TooShortAfterIDD(TooShort):
     """Raised when the number is too short after IDD."""
-    error_type = NumberParseException.TOO_SHORT_AFTER_IDD
+
+    error_type = NumberParseErrorType.TOO_SHORT_AFTER_IDD
 
     def __init__(self, msg: str):
         super().__init__(self.error_type, msg)
 
 
-class TooShortNsn(NumberParseException):
+class TooShortNsn(TooShort):
     """Raised when the number is too short after IDD."""
-    error_type = NumberParseException.TOO_SHORT_NSN
+
+    error_type = NumberParseErrorType.TOO_SHORT_NSN
 
     def __init__(self, msg: str):
         super().__init__(self.error_type, msg)
