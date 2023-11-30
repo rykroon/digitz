@@ -43,6 +43,12 @@ def test_region_code():
     num = PhoneNumber.from_string("+1 (202) 555-0192")
     assert num.region_code == "US"
 
+    num = PhoneNumber.from_string("+1 (204) 555-0192")
+    assert num.region_code == "CA"
+
+    num = PhoneNumber.from_string("+52 55 1234 5678")
+    assert num.region_code == "MX"
+
 
 # def test_get_country_name():
 #     num = PhoneNumber.from_string("+1 (202) 555-0192")
