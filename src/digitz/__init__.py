@@ -49,7 +49,7 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             str: The region code of the phone number.
         """
-        return pn.region_code_for_country_code(self.country_code)
+        return pn.region_code_for_number(self)
 
     def get_country_name(self, lang: str = "en") -> str:
         """Return the country name of the phone number.
