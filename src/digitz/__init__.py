@@ -104,7 +104,7 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             bool: Whether the phone number is toll free.
         """
-        return self.number_type is PhoneNumberType.TOLL_FREE
+        return self.number_type == PhoneNumberType.TOLL_FREE
 
     def to_string(self, format: PhoneNumberFormat = PhoneNumberFormat.E164) -> str:
         """Return the phone number as a string in the specified format.
