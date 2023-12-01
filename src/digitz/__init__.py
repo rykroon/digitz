@@ -16,7 +16,7 @@ from .exceptions import (
 
 class PhoneNumber(pn.PhoneNumber):
     @classmethod
-    def from_string(cls, string: str, /) -> "PhoneNumber":
+    def parse(cls, string: str, /) -> "PhoneNumber":
         """Parse a phone number from a string.
 
         Parameters:
@@ -106,11 +106,11 @@ class PhoneNumber(pn.PhoneNumber):
         """
         return self.number_type == PhoneNumberType.TOLL_FREE
 
-    def to_string(self, format: PhoneNumberFormat = PhoneNumberFormat.E164) -> str:
+    def format(self, format: PhoneNumberFormat) -> str:
         """Return the phone number as a string in the specified format.
 
         Parameters:
-            format: The format to use. Defaults to E.164.
+            format: The format to use.
 
         Returns:
             str: The phone number in the specified format.
@@ -123,7 +123,7 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             str: The phone number in E.164 format.
         """
-        return self.to_string(PhoneNumberFormat.E164)
+        return self.format(PhoneNumberFormat.E164)
 
     def to_international(self) -> str:
         """Return the phone number in international format.
@@ -131,7 +131,7 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             str: The phone number in international format.
         """
-        return self.to_string(PhoneNumberFormat.INTERNATIONAL)
+        return self.format(PhoneNumberFormat.INTERNATIONAL)
 
     def to_national(self) -> str:
         """Return the phone number in national format.
@@ -139,7 +139,7 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             str: The phone number in national format.
         """
-        return self.to_string(PhoneNumberFormat.NATIONAL)
+        return self.format(PhoneNumberFormat.NATIONAL)
 
     def to_rfc3966(self) -> str:
         """Return the phone number in RFC3966 format.
@@ -147,7 +147,7 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             str: The phone number in RFC3966 format.
         """
-        return self.to_string(PhoneNumberFormat.RFC3966)
+        return self.format(PhoneNumberFormat.RFC3966)
 
     def __str__(self) -> str:
         """Return the phone number in E.164 format.
