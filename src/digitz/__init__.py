@@ -6,7 +6,10 @@ from typing import Optional
 import phonenumbers as pn
 
 from .enums import (
-    PhoneNumberFormat, PhoneNumberType, NumberParseErrorType, CountryCodeSource
+    CountryCodeSource,
+    NumberParseErrorType,
+    PhoneNumberFormat,
+    PhoneNumberType,
 )
 from .exceptions import (
     InvalidCountryCode,
@@ -29,17 +32,26 @@ class PhoneNumber(pn.PhoneNumber):
     preferred_domestic_carrier_code: Optional[str]
 
     @classmethod
-    def parse(cls, string: str, /) -> "PhoneNumber":
-        """Parse a phone number from a string.
+    def parse(
+        cls,
+        number: str,
+        /,
+        *,
+        region: Optional[str] = None,
+        keep_raw_input: bool = False,
+    ) -> "PhoneNumber":
+        """Parse a phone number.
 
         Parameters:
-            string: The string to parse.
+            number: The phone number to parse.
 
         Returns:
-            A PhoneNumber object.
+            PhoneNumber: The parsed phone number.
         """
         try:
-            return pn.parse(string, keep_raw_input=True, numobj=cls())
+            return pn.parse(
+                number, region=region, keep_raw_input=keep_raw_input, numobj=cls()
+            )
 
         except pn.NumberParseException as e:
             if e.error_type == NumberParseErrorType.INVALID_COUNTRY_CODE:
@@ -64,6 +76,15 @@ class PhoneNumber(pn.PhoneNumber):
         """
         return pn.region_code_for_number(self)
 
+    @property
+    def number_type(self) -> PhoneNumberType:
+        """Return the type of phone number.
+
+        Returns:
+            The type of phone number.
+        """
+        return PhoneNumberType(pn.number_type(self))
+
     def get_country_name(self, lang: str = "en") -> str:
         """Return the country name of the phone number.
         Parameters:
@@ -85,15 +106,6 @@ class PhoneNumber(pn.PhoneNumber):
         from phonenumbers.geocoder import description_for_number
 
         return description_for_number(self, lang)
-
-    @property
-    def number_type(self) -> PhoneNumberType:
-        """Return the type of phone number.
-
-        Returns:
-            The type of phone number.
-        """
-        return PhoneNumberType(pn.number_type(self))
 
     def is_possible(self) -> bool:
         """Return whether the phone number is possible.
