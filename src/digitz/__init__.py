@@ -49,7 +49,7 @@ class PhoneNumber(pn.PhoneNumber):
             PhoneNumber: The parsed phone number.
         """
         try:
-            return pn.parse(
+            numobj = pn.parse(
                 number, region=region, keep_raw_input=keep_raw_input, numobj=cls()
             )
 
@@ -66,6 +66,10 @@ class PhoneNumber(pn.PhoneNumber):
                 raise TooShortNsn(e._msg) from e
             else:
                 raise
+
+        else:
+            numobj.country_code_source = CountryCodeSource(numobj.country_code_source)
+            return numobj
 
     @property
     def region_code(self) -> str:
