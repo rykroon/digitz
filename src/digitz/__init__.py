@@ -1,10 +1,13 @@
 # SPDX-FileCopyrightText: 2023-present Ryan Kroon <rykroon.tech@gmail.com>
 #
 # SPDX-License-Identifier: MIT
-
+from dataclasses import dataclass
+from typing import Optional
 import phonenumbers as pn
 
-from .enums import PhoneNumberFormat, PhoneNumberType, NumberParseErrorType
+from .enums import (
+    PhoneNumberFormat, PhoneNumberType, NumberParseErrorType, CountryCodeSource
+)
 from .exceptions import (
     InvalidCountryCode,
     NotANumber,
@@ -14,7 +17,17 @@ from .exceptions import (
 )
 
 
+@dataclass(init=False, repr=False, eq=False)
 class PhoneNumber(pn.PhoneNumber):
+    country_code: int
+    national_number: int
+    extension: Optional[str]
+    italian_leading_zero: Optional[bool]
+    number_of_leading_zeros: Optional[int]
+    raw_input: Optional[str]
+    country_code_source: Optional[CountryCodeSource]
+    preferred_domestic_carrier_code: Optional[str]
+
     @classmethod
     def parse(cls, string: str, /) -> "PhoneNumber":
         """Parse a phone number from a string.
@@ -26,7 +39,7 @@ class PhoneNumber(pn.PhoneNumber):
             A PhoneNumber object.
         """
         try:
-            return pn.parse(string, numobj=cls())
+            return pn.parse(string, keep_raw_input=True, numobj=cls())
 
         except pn.NumberParseException as e:
             if e.error_type == NumberParseErrorType.INVALID_COUNTRY_CODE:
