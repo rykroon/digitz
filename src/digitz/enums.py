@@ -36,3 +36,13 @@ class NumberParseErrorType(IntEnum):
     TOO_SHORT_AFTER_IDD = pn.NumberParseException.TOO_SHORT_AFTER_IDD
     TOO_SHORT_NSN = pn.NumberParseException.TOO_SHORT_NSN
     TOO_LONG = pn.NumberParseException.TOO_LONG
+
+
+class CountryCodeSource(IntEnum):
+    """Enum for phone number country code sources."""
+
+    UNSPECIFIED = pn.CountryCodeSource.UNSPECIFIED
+    FROM_NUMBER_WITH_PLUS_SIGN = pn.CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN
+    FROM_NUMBER_WITH_IDD = pn.CountryCodeSource.FROM_NUMBER_WITH_IDD
+    FROM_NUMBER_WITHOUT_PLUS_SIGN = pn.CountryCodeSource.FROM_NUMBER_WITHOUT_PLUS_SIGN
+    FROM_DEFAULT_COUNTRY = pn.CountryCodeSource.FROM_DEFAULT_COUNTRY
