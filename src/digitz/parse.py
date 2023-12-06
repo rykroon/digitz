@@ -23,11 +23,11 @@ class PhoneNumberTuple(NamedTuple):
     preferred_domestic_carrier_code: Optional[str]
 
 
-def parse(number: str, /, *, region: Optional[str] = None, keep_raw_input: bool = False) -> PhoneNumberTuple:
+def parse(
+    number: str, /, *, region: Optional[str] = None, keep_raw_input: bool = False
+) -> PhoneNumberTuple:
     try:
-        numobj = pn.parse(
-            number, region=region, keep_raw_input=keep_raw_input
-        )
+        numobj = pn.parse(number, region=region, keep_raw_input=keep_raw_input)
 
     except pn.NumberParseException as e:
         if e.error_type == NumberParseErrorType.INVALID_COUNTRY_CODE:
