@@ -2,25 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Optional
 import phonenumbers as pn
 
-from .enums import (
-    CountryCodeSource,
-    NumberParseErrorType,
-    PhoneNumberFormat,
-    PhoneNumberType,
-)
-from .exceptions import (
-    InvalidCountryCode,
-    NotANumber,
-    TooLong,
-    TooShortAfterIDD,
-    TooShortNsn,
-)
+from .enums import CountryCodeSource, PhoneNumberFormat, PhoneNumberType
+from .parse import parse
 
 
-@dataclass(init=False, repr=False, eq=False)
+@dataclass(repr=False, eq=False, frozen=True)
 class PhoneNumber(pn.PhoneNumber):
     country_code: int
     national_number: int
@@ -44,34 +34,25 @@ class PhoneNumber(pn.PhoneNumber):
 
         Parameters:
             number: The phone number to parse.
+            region: The region to assume for phone numbers without an international prefix.
+            keep_raw_input: Whether to keep the raw input.
 
         Returns:
             PhoneNumber: The parsed phone number.
         """
-        try:
-            numobj = pn.parse(
-                number, region=region, keep_raw_input=keep_raw_input, numobj=cls()
-            )
+        result = parse(number, region=region, keep_raw_input=keep_raw_input)
+        return cls(
+            country_code=result.country_code,
+            national_number=result.national_number,
+            extension=result.extension,
+            italian_leading_zero=result.italian_leading_zero,
+            number_of_leading_zeros=result.number_of_leading_zeros,
+            raw_input=result.raw_input,
+            country_code_source=result.country_code_source,
+            preferred_domestic_carrier_code=result.preferred_domestic_carrier_code,
+        )
 
-        except pn.NumberParseException as e:
-            if e.error_type == NumberParseErrorType.INVALID_COUNTRY_CODE:
-                raise InvalidCountryCode(e._msg) from e
-            elif e.error_type == NumberParseErrorType.NOT_A_NUMBER:
-                raise NotANumber(e._msg) from e
-            elif e.error_type == NumberParseErrorType.TOO_LONG:
-                raise TooLong(e._msg) from e
-            elif e.error_type == NumberParseErrorType.TOO_SHORT_AFTER_IDD:
-                raise TooShortAfterIDD(e._msg) from e
-            elif e.error_type == NumberParseErrorType.TOO_SHORT_NSN:
-                raise TooShortNsn(e._msg) from e
-            else:
-                raise
-
-        else:
-            numobj.country_code_source = CountryCodeSource(numobj.country_code_source)
-            return numobj
-
-    @property
+    @cached_property
     def region_code(self) -> str:
         """Return the region code of the phone number.
 
@@ -80,7 +61,7 @@ class PhoneNumber(pn.PhoneNumber):
         """
         return pn.region_code_for_number(self)
 
-    @property
+    @cached_property
     def number_type(self) -> PhoneNumberType:
         """Return the type of phone number.
 
