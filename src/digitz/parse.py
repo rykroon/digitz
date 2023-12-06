@@ -1,9 +1,8 @@
-from collections import namedtuple
-from typing import Optional
+from typing import NamedTuple, Optional
 
 import phonenumbers as pn
 
-from .enums import NumberParseErrorType
+from .enums import NumberParseErrorType, CountryCodeSource
 from .exceptions import (
     InvalidCountryCode,
     NotANumber,
@@ -12,21 +11,19 @@ from .exceptions import (
     TooShortNsn,
 )
 
-PhoneNumberTuple = namedtuple(
-    "PhoneNumberTuple",
-    [
-        "country_code",
-        "national_number",
-        "extension",
-        "italian_leading_zero",
-        "number_of_leading_zeros", 
-        "raw_input"
-        "country_code_source",
-        "preferred_domestic_carrier_code",
-    ]
-)
 
-def parse(number: str, /, *, region: Optional[str] = None, keep_raw_input: bool = False) -> PhoneNumber:
+class PhoneNumberTuple(NamedTuple):
+    country_code: int
+    national_number: int
+    extension: Optional[str]
+    italian_leading_zero: Optional[bool]
+    number_of_leading_zeros: Optional[int]
+    raw_input: Optional[str]
+    country_code_source: Optional[CountryCodeSource]
+    preferred_domestic_carrier_code: Optional[str]
+
+
+def parse(number: str, /, *, region: Optional[str] = None, keep_raw_input: bool = False) -> PhoneNumberTuple:
     try:
         numobj = pn.parse(
             number, region=region, keep_raw_input=keep_raw_input
@@ -53,6 +50,6 @@ def parse(number: str, /, *, region: Optional[str] = None, keep_raw_input: bool 
             italian_leading_zero=numobj.italian_leading_zero,
             number_of_leading_zeros=numobj.number_of_leading_zeros,
             raw_input=numobj.raw_input,
-            country_code_source=numobj.country_code_source,
+            country_code_source=CountryCodeSource(numobj.country_code_source),
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
