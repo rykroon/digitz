@@ -1,0 +1,55 @@
+site_name: Digitz
+site_description: abc
+site_url: https://digitz.rykroon.com/
+
+
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+
+  palette:
+
+    - scheme: 'default'
+      primary: dark-blue
+      accent: orange
+      media: '(prefers-color-scheme: light)'
+      toggle:
+        icon: 'material/brightness-7'
+        name: 'Switch to dark mode'
+
+    - scheme: 'slate'
+      primary: dark-blue
+      accent: orange
+      media: '(prefers-color-scheme: dark)'
+      toggle:
+        icon: 'material/brightness-4'
+        name: 'Switch to light mode'
+
+  features:
+      - navigation.sections
+
+
+repo_name: rykroon/digitz
+repo_url: https://github.com/rykroon/digitz/
+
+
+nav:
+  - Introduction: index.md
+
+
+watch:
+  - src/digitz
+
+
+markdown_extensions:
+  - admonition
+
+plugins:
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_root_heading: true
+          separate_signature: true
+          show_source: false
