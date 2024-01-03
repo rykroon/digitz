@@ -55,7 +55,7 @@ cov = [
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.coverage.run]
-source_pkgs = ["digitz", "tests"]
+source_pkgs = ["digitz"]
 branch = true
 parallel = true
 omit = [
