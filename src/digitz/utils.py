@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Tuple, Union
 import phonenumbers as pn
 from .enums import PhoneNumberType, PhoneNumberFormat
 from .interface import PhoneNumberInterface
@@ -87,7 +87,7 @@ def get_region_code(num_or_str: Union[PhoneNumberInterface, str], /) -> str:
     return pn.region_code_for_number(num)
 
 
-def get_timezones(num_or_str: Union[PhoneNumberInterface, str], /) -> list:
+def get_timezones(num_or_str: Union[PhoneNumberInterface, str], /) -> Tuple[str, ...]:
     """Return the timezones of the phone number.
     Parameters:
         num_or_str: The phone number.

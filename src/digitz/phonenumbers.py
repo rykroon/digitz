@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Type, TypeVar
 
 from .enums import CountryCodeSource, PhoneNumberFormat, PhoneNumberType
 from .parse import parse
@@ -19,6 +19,9 @@ from .utils import (
 )
 
 
+Self = TypeVar("Self", bound="PhoneNumber")
+
+
 @dataclass(repr=False, frozen=True)
 class PhoneNumber:
     country_code: int
@@ -32,13 +35,13 @@ class PhoneNumber:
 
     @classmethod
     def parse(
-        cls,
+        cls: Type[Self],
         number: str,
         /,
         *,
         region: Optional[str] = None,
         keep_raw_input: bool = False,
-    ) -> "PhoneNumber":
+    ) -> Self:
         """Parse a phone number.
 
         Parameters:
@@ -69,7 +72,7 @@ class PhoneNumber:
             The type of phone number.
         """
         return get_number_type(self)
-    
+
     @cached_property
     def timezones(self) -> Tuple[str, ...]:
         return get_timezones(self)
