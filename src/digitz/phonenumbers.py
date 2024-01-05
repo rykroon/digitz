@@ -1,37 +1,39 @@
 # SPDX-FileCopyrightText: 2023-present Ryan Kroon <rykroon.tech@gmail.com>
 #
 # SPDX-License-Identifier: MIT
-from dataclasses import dataclass
 from functools import cached_property
-from typing import Optional, Tuple, Type, TypeVar
+from typing import Optional, Type, TypeVar
 
-from .enums import CountryCodeSource, PhoneNumberFormat, PhoneNumberType
-from .parse import parse
-from .utils import (
-    format_number,
-    get_country_name,
-    get_description,
-    get_number_type,
-    get_region_code,
-    get_timezones,
-    is_possible_number,
-    is_valid_number,
+import phonenumbers as pn
+
+from .enums import (
+    CountryCodeSource,
+    PhoneNumberFormat,
+    PhoneNumberType,
+    NumberParseErrorType,
 )
-
+from .exceptions import (
+    InvalidCountryCode,
+    NotANumber,
+    TooLong,
+    TooShortAfterIDD,
+    TooShortNsn,
+)
 
 Self = TypeVar("Self", bound="PhoneNumber")
 
 
-@dataclass(repr=False, frozen=True)
-class PhoneNumber:
-    country_code: int
-    national_number: int
-    extension: Optional[str]
-    italian_leading_zero: Optional[bool]
-    number_of_leading_zeros: Optional[int]
-    raw_input: Optional[str]
-    country_code_source: Optional[CountryCodeSource]
-    preferred_domestic_carrier_code: Optional[str]
+class PhoneNumber(pn.PhoneNumber):
+    __slots__ = (
+        "country_code",
+        "national_number",
+        "extension",
+        "italian_leading_zero",
+        "number_of_leading_zeros",
+        "raw_input",
+        "country_code_source",
+        "preferred_domestic_carrier_code",
+    )
 
     @classmethod
     def parse(
@@ -52,8 +54,32 @@ class PhoneNumber:
         Returns:
             PhoneNumber: The parsed phone number.
         """
-        numtup = parse(number, region=region, keep_raw_input=keep_raw_input)
-        return cls(*numtup)
+        try:
+            numobj = pn.parse(
+                number, region=region, keep_raw_input=keep_raw_input, numobj=cls()
+            )
+
+        except pn.NumberParseException as e:
+            if e.error_type == NumberParseErrorType.INVALID_COUNTRY_CODE:
+                raise InvalidCountryCode(e._msg) from e
+
+            elif e.error_type == NumberParseErrorType.NOT_A_NUMBER:
+                raise NotANumber(e._msg) from e
+
+            elif e.error_type == NumberParseErrorType.TOO_LONG:
+                raise TooLong(e._msg) from e
+
+            elif e.error_type == NumberParseErrorType.TOO_SHORT_AFTER_IDD:
+                raise TooShortAfterIDD(e._msg) from e
+
+            elif e.error_type == NumberParseErrorType.TOO_SHORT_NSN:
+                raise TooShortNsn(e._msg) from e
+
+            else:
+                raise e
+
+        numobj.country_code_source = CountryCodeSource(numobj.country_code_source)
+        return numobj
 
     @cached_property
     def region_code(self) -> str:
@@ -62,7 +88,7 @@ class PhoneNumber:
         Returns:
             str: The region code of the phone number.
         """
-        return get_region_code(self)
+        return pn.region_code_for_number(self)
 
     @cached_property
     def number_type(self) -> PhoneNumberType:
@@ -71,29 +97,7 @@ class PhoneNumber:
         Returns:
             The type of phone number.
         """
-        return get_number_type(self)
-
-    @cached_property
-    def timezones(self) -> Tuple[str, ...]:
-        return get_timezones(self)
-
-    def get_country_name(self, lang: str = "en") -> str:
-        """Return the country name of the phone number.
-        Parameters:
-            lang: The language to use.
-        Returns:
-            The country name of the phone number.
-        """
-        return get_country_name(self, lang)
-
-    def get_description(self, lang: str = "en") -> str:
-        """Return the description of the phone number.
-        Parameters:
-            lang: The language to use.
-        Returns:
-            The description of the phone number.
-        """
-        return get_description(self, lang)
+        return pn.number_type(self)
 
     def is_possible(self) -> bool:
         """Return whether the phone number is possible.
@@ -101,7 +105,7 @@ class PhoneNumber:
         Returns:
             bool: Whether the phone number is possible.
         """
-        return is_possible_number(self)
+        return pn.is_possible_number(self)
 
     def is_valid(self) -> bool:
         """Return whether the phone number is valid.
@@ -109,7 +113,7 @@ class PhoneNumber:
         Returns:
             bool: Whether the phone number is valid.
         """
-        return is_valid_number(self)
+        return pn.is_valid_number(self)
 
     def is_toll_free(self) -> bool:
         """Return whether the phone number is toll free.
@@ -128,7 +132,7 @@ class PhoneNumber:
         Returns:
             str: The phone number in the specified format.
         """
-        return format_number(self, format)
+        return pn.format_number(self, format)
 
     def to_e164(self) -> str:
         """Return the phone number in E.164 format.
@@ -169,11 +173,3 @@ class PhoneNumber:
             str: The phone number in E.164 format.
         """
         return self.to_e164()
-
-    def __repr__(self) -> str:
-        """Return the phone number in International format.
-
-        Returns:
-            str: The phone number in International format.
-        """
-        return f"<{self.__class__.__name__}: {self.to_international()}>"
