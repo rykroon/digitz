@@ -36,6 +36,10 @@ repo_url: https://github.com/rykroon/digitz/
 
 nav:
   - Introduction: index.md
+  - API Reference:
+    - Phone Numbers: apiref/phonenumbers.md
+    - Enums: apiref/enums.md
+    - Exceptions: apiref/exceptions.md
 
 
 watch:
