@@ -34,7 +34,7 @@ class TooShort(NumberParseException):
 
 
 class TooShortAfterIDD(TooShort):
-    """Raised when the number is too short after IDD."""
+    """Raised when the number is too short after International Direct Dialing (IDD)."""
 
     error_type = NumberParseErrorType.TOO_SHORT_AFTER_IDD
 
@@ -43,7 +43,7 @@ class TooShortAfterIDD(TooShort):
 
 
 class TooShortNsn(TooShort):
-    """Raised when the number is too short after IDD."""
+    """Raised when the number is shorter than the National Significant Number (NSN)."""
 
     error_type = NumberParseErrorType.TOO_SHORT_NSN
 

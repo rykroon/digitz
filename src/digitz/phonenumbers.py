@@ -20,8 +20,6 @@ from .exceptions import (
     TooShortNsn,
 )
 
-Self = TypeVar("Self", bound="PhoneNumber")
-
 
 class PhoneNumber(pn.PhoneNumber):
     __slots__ = (
@@ -37,13 +35,13 @@ class PhoneNumber(pn.PhoneNumber):
 
     @classmethod
     def parse(
-        cls: Type[Self],
+        cls: Type["PhoneNumber"],
         number: str,
         /,
         *,
         region: Optional[str] = None,
         keep_raw_input: bool = False,
-    ) -> Self:
+    ) -> "PhoneNumber":
         """Parse a phone number.
 
         Parameters:
@@ -79,11 +77,12 @@ class PhoneNumber(pn.PhoneNumber):
                 raise e
 
         numobj.country_code_source = CountryCodeSource(numobj.country_code_source)
+        assert isinstance(numobj, cls)
         return numobj
 
     @cached_property
-    def region_code(self) -> str:
-        """Return the region code of the phone number.
+    def region_code(self) -> Optional[str]:
+        """Returns the region code of the phone number.
 
         Returns:
             str: The region code of the phone number.
@@ -92,15 +91,15 @@ class PhoneNumber(pn.PhoneNumber):
 
     @cached_property
     def number_type(self) -> PhoneNumberType:
-        """Return the type of phone number.
+        """Returns the phone number type.
 
         Returns:
             The type of phone number.
         """
-        return pn.number_type(self)
+        return PhoneNumberType(pn.number_type(self))
 
     def is_possible(self) -> bool:
-        """Return whether the phone number is possible.
+        """Returns whether the phone number is possible.
 
         Returns:
             bool: Whether the phone number is possible.
@@ -108,7 +107,7 @@ class PhoneNumber(pn.PhoneNumber):
         return pn.is_possible_number(self)
 
     def is_valid(self) -> bool:
-        """Return whether the phone number is valid.
+        """Returns whether the phone number is valid.
 
         Returns:
             bool: Whether the phone number is valid.
@@ -116,7 +115,7 @@ class PhoneNumber(pn.PhoneNumber):
         return pn.is_valid_number(self)
 
     def is_toll_free(self) -> bool:
-        """Return whether the phone number is toll free.
+        """Returns whether the phone number is toll free.
 
         Returns:
             bool: Whether the phone number is toll free.
@@ -124,7 +123,7 @@ class PhoneNumber(pn.PhoneNumber):
         return self.number_type == PhoneNumberType.TOLL_FREE
 
     def format(self, format: PhoneNumberFormat) -> str:
-        """Return the phone number as a string in the specified format.
+        """Returns the phone number as a string in the specified format.
 
         Parameters:
             format: The format to use.
@@ -135,7 +134,7 @@ class PhoneNumber(pn.PhoneNumber):
         return pn.format_number(self, format)
 
     def to_e164(self) -> str:
-        """Return the phone number in E.164 format.
+        """Returns the phone number in E.164 format.
 
         Returns:
             str: The phone number in E.164 format.
@@ -143,7 +142,7 @@ class PhoneNumber(pn.PhoneNumber):
         return self.format(PhoneNumberFormat.E164)
 
     def to_international(self) -> str:
-        """Return the phone number in international format.
+        """Returns the phone number in international format.
 
         Returns:
             str: The phone number in international format.
@@ -151,7 +150,7 @@ class PhoneNumber(pn.PhoneNumber):
         return self.format(PhoneNumberFormat.INTERNATIONAL)
 
     def to_national(self) -> str:
-        """Return the phone number in national format.
+        """Returns the phone number in national format.
 
         Returns:
             str: The phone number in national format.
@@ -159,7 +158,7 @@ class PhoneNumber(pn.PhoneNumber):
         return self.format(PhoneNumberFormat.NATIONAL)
 
     def to_rfc3966(self) -> str:
-        """Return the phone number in RFC3966 format.
+        """Returns the phone number in RFC3966 format.
 
         Returns:
             str: The phone number in RFC3966 format.
@@ -167,7 +166,7 @@ class PhoneNumber(pn.PhoneNumber):
         return self.format(PhoneNumberFormat.RFC3966)
 
     def __str__(self) -> str:
-        """Return the phone number in E.164 format.
+        """Returns the phone number in E.164 format.
 
         Returns:
             str: The phone number in E.164 format.
