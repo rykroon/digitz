@@ -18,7 +18,7 @@ MX_EXAMPLE_NUMBER = "+52 200 123 4567"
 
 
 def test_parse():
-    num = PhoneNumber.parse("+1 (201) 555-0123")
+    num = PhoneNumber.parse(US_EXAMPLE_NUMBER)
 
 
 def test_parse_invalid_country_code():
@@ -36,9 +36,9 @@ def test_parse_too_long():
         PhoneNumber.parse("+1 (201) 555-0123012301230123")
 
 
-# def test_parse_too_short_after_idd():
-#     with pytest.raises(TooShortAfterIDD):
-#         PhoneNumber.parse("+1 (202) 555-0192")
+def test_parse_too_short_after_idd():
+    with pytest.raises(TooShortAfterIDD):
+        PhoneNumber.parse("011", region="US")
 
 
 def test_parse_too_short_nsn():
