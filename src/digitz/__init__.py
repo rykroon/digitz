@@ -1,4 +1,3 @@
-from .phonenumbers import PhoneNumber
 from .enums import (
     CountryCodeSource,
     NumberParseErrorType,
@@ -12,9 +11,30 @@ from .exceptions import (
     TooShortAfterIDD,
     TooShortNsn,
 )
+from .phonenumbers import PhoneNumber, FrozenPhoneNumber, PhoneNumberTuple
+from .utils import (
+    get_country_name,
+    get_description,
+    get_region_code,
+    get_number_type,
+    get_timezones,
+    is_possible,
+    is_valid,
+    is_toll_free,
+    format,
+    parse,
+    to_e164,
+    to_international,
+    to_national,
+    to_rfc3966,
+    to_dict,
+    to_tuple,
+)
 
 __all__ = [
     "PhoneNumber",
+    "FrozenPhoneNumber",
+    "PhoneNumberTuple",
     "CountryCodeSource",
     "NumberParseErrorType",
     "PhoneNumberFormat",
@@ -24,4 +44,20 @@ __all__ = [
     "TooLong",
     "TooShortAfterIDD",
     "TooShortNsn",
+    "parse",
+    "get_country_name",
+    "get_description",
+    "get_region_code",
+    "get_number_type",
+    "get_timezones",
+    "is_possible",
+    "is_valid",
+    "is_toll_free",
+    "format",
+    "to_e164",
+    "to_international",
+    "to_national",
+    "to_rfc3966",
+    "to_dict",
+    "to_tuple",
 ]
