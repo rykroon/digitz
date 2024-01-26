@@ -9,7 +9,7 @@ from .enums import (
     PhoneNumberType,
     PhoneNumberFormat,
 )
-from .phonenumbers import PhoneNumber, PhoneNumberInterface
+from .phonenumbers import PhoneNumber, PhoneNumberInterface, SlottedPhoneNumber
 from .exceptions import (
     InvalidCountryCode,
     NotANumber,
@@ -36,7 +36,7 @@ def parse(
         and numcls.__dataclass_params__.frozen is True
     )
     # If numcls is immutable, then we need to use a mutable object to parse the number.
-    numobj = numcls() if not is_immutable else PhoneNumber()
+    numobj = numcls() if not is_immutable else SlottedPhoneNumber()
 
     try:
         numobj = pn.parse(

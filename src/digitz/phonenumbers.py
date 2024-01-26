@@ -21,13 +21,56 @@ class PhoneNumberInterface(Protocol):
     preferred_domestic_carrier_code: Optional[str]
 
 
-dataclass_kwargs = {}
-
 if sys.version_info >= (3, 10):
-    dataclass_kwargs["slots"] = True
+
+    @dataclass(slots=True)
+    class SlottedPhoneNumber:
+        """A phone number."""
+        country_code: int = 0
+        national_number: int = 0
+        extension: Optional[str] = None
+        italian_leading_zero: Optional[bool] = None
+        number_of_leading_zeros: Optional[int] = None
+        raw_input: Optional[str] = None
+        country_code_source: Optional[CountryCodeSource] = CountryCodeSource.UNSPECIFIED
+        preferred_domestic_carrier_code: Optional[str] = None
+
+else:
+
+    class SlottedPhoneNumber:
+        __slots__ = (
+            "country_code",
+            "national_number",
+            "extension",
+            "italian_leading_zero",
+            "number_of_leading_zeros",
+            "raw_input",
+            "country_code_source",
+            "preferred_domestic_carrier_code",
+        )
+
+        def __init__(
+            self,
+            country_code: int = 0,
+            national_number: int = 0,
+            extension: Optional[str] = None,
+            italian_leading_zero: Optional[bool] = None,
+            number_of_leading_zeros: Optional[int] = None,
+            raw_input: Optional[str] = None,
+            country_code_source: Optional[CountryCodeSource] = CountryCodeSource.UNSPECIFIED,
+            preferred_domestic_carrier_code: Optional[str] = None
+        ) -> None:
+            self.country_code = country_code
+            self.national_number = national_number
+            self.extension = extension
+            self.italian_leading_zero = italian_leading_zero
+            self.number_of_leading_zeros = number_of_leading_zeros
+            self.raw_input = raw_input
+            self.country_code_source = country_code_source
+            self.preferred_domestic_carrier_code = preferred_domestic_carrier_code
 
 
-@dataclass(**dataclass_kwargs)
+@dataclass
 class PhoneNumber:
     """A phone number."""
 
@@ -41,7 +84,7 @@ class PhoneNumber:
     preferred_domestic_carrier_code: Optional[str] = None
 
 
-@dataclass(frozen=True, **dataclass_kwargs)
+@dataclass(frozen=True)
 class FrozenPhoneNumber:
     """A frozen phone number."""
 
