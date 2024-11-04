@@ -74,7 +74,7 @@ class PhoneNumberMixin:
     def get_number_type(self) -> PhoneNumberType:
         return PhoneNumberType(pn.number_type(self))
 
-    def get_region_code(self) -> str | None:
+    def get_region_code(self) -> Optional[str]:
         return pn.region_code_for_number(self)
 
     def is_toll_free(self) -> bool:
@@ -85,15 +85,15 @@ class PhoneNumberMixin:
 
     def is_valid(self) -> bool:
         return pn.is_valid_number(self)
-    
-    def get_country_name(self) -> str:
+
+    def get_country_name(self, lang: str = "en") -> str:
         from phonenumbers.geocoder import country_name_for_number
-        return country_name_for_number(self)
+        return country_name_for_number(self, lang=lang)
     
-    def get_description(self) -> str:
+    def get_description(self, lang: str = "en") -> str:
         from phonenumbers.geocoder import description_for_number
-        return description_for_number(self)
-    
+        return description_for_number(self, lang=lang)
+
     def get_carrier_name(self) -> str:
         from phonenumbers.carrier import name_for_number
         return name_for_number(self)
@@ -142,5 +142,5 @@ class FrozenPhoneNumber(PhoneNumberMixin):
     italian_leading_zero: Optional[bool]
     number_of_leading_zeros: Optional[int]
     raw_input: Optional[str]
-    country_code_source: Optional[CountryCodeSource] = CountryCodeSource.UNSPECIFIED
+    country_code_source: Optional[CountryCodeSource]
     preferred_domestic_carrier_code: Optional[str]
