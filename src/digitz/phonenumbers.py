@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
-from typing import Optional, Type, TypeVar
+from typing import Optional, Tuple, Type, TypeVar
 
 import phonenumbers as pn
 
@@ -18,6 +18,15 @@ Self = TypeVar("Self", bound="PhoneNumberMixin")
 
 
 class PhoneNumberMixin:
+
+    country_code: int
+    national_number: int
+    extension: Optional[str]
+    italian_leading_zero: Optional[bool]
+    number_of_leading_zeros: Optional[int]
+    raw_input: Optional[str]
+    country_code_source: Optional[CountryCodeSource]
+    preferred_domestic_carrier_code: Optional[str]
 
     @classmethod
     def parse(
@@ -62,13 +71,13 @@ class PhoneNumberMixin:
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
 
-    def get_number_type(self):
+    def get_number_type(self) -> PhoneNumberType:
         return PhoneNumberType(pn.number_type(self))
 
-    def get_region_code(self):
+    def get_region_code(self) -> str | None:
         return pn.region_code_for_number(self)
 
-    def is_toll_free(self):
+    def is_toll_free(self) -> bool:
         return self.get_number_type() == PhoneNumberType.TOLL_FREE
 
     def is_possible(self) -> bool:
@@ -76,8 +85,24 @@ class PhoneNumberMixin:
 
     def is_valid(self) -> bool:
         return pn.is_valid_number(self)
+    
+    def get_country_name(self) -> str:
+        from phonenumbers.geocoder import country_name_for_number
+        return country_name_for_number(self)
+    
+    def get_description(self) -> str:
+        from phonenumbers.geocoder import description_for_number
+        return description_for_number(self)
+    
+    def get_carrier_name(self) -> str:
+        from phonenumbers.carrier import name_for_number
+        return name_for_number(self)
 
-    def format(self, format: PhoneNumberFormat):
+    def get_timezones(self) -> Tuple[str, ...]:
+        from phonenumbers.timezone import time_zones_for_number
+        return time_zones_for_number(self)
+
+    def format(self, format: PhoneNumberFormat) -> str:
         return pn.format_number(self, format)
 
     def to_e164(self) -> str:
