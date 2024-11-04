@@ -1,2 +1,0 @@
-from phonenumbers.geocoder import country_name_for_number, description_for_number
-from phonenumbers.timezone import time_zones_for_number
