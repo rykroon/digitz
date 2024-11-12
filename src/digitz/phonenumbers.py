@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
+from functools import cache, cached_property
 from typing import Optional, Tuple, Type, TypeVar
 
 import phonenumbers as pn
@@ -17,8 +18,7 @@ from digitz.exceptions import (
 Self = TypeVar("Self", bound="PhoneNumberMixin")
 
 
-class PhoneNumberMixin:
-
+class PhoneNumberMixin(pn.PhoneNumber):
     country_code: int
     national_number: int
     extension: Optional[str]
@@ -71,36 +71,72 @@ class PhoneNumberMixin:
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
 
-    def get_number_type(self) -> PhoneNumberType:
+    @property
+    def number_type(self) -> PhoneNumberType:
         return PhoneNumberType(pn.number_type(self))
 
-    def get_region_code(self) -> Optional[str]:
+    @property
+    def region_code(self) -> Optional[str]:
         return pn.region_code_for_number(self)
 
-    def is_toll_free(self) -> bool:
-        return self.get_number_type() == PhoneNumberType.TOLL_FREE
-
+    @property
     def is_possible(self) -> bool:
         return pn.is_possible_number(self)
 
+    @property
     def is_valid(self) -> bool:
         return pn.is_valid_number(self)
 
-    def get_country_name(self, lang: str = "en") -> str:
+    @property
+    def national_significant_number(self):
+        return pn.national_significant_number(self)
+
+    @property
+    def area_code_length(self) -> int:
+        return pn.length_of_geographical_area_code(self)
+
+    @property
+    def national_destination_code_length(self) -> int:
+        return pn.length_of_national_destination_code(self)
+
+    @property
+    def timezones(self) -> Tuple[str, ...]:
+        from phonenumbers.timezone import time_zones_for_number
+        return time_zones_for_number(self)
+
+    @property
+    def is_toll_free(self) -> bool:
+        return self.number_type == PhoneNumberType.TOLL_FREE
+
+    @property
+    def is_voip(self) -> bool:
+        return self.number_type == PhoneNumberType.VOIP
+
+    @property
+    def national_destination_code(self) -> Optional[str]:
+        if self.national_destination_code_length == 0:
+            return None
+        return self.national_significant_number[:self.national_destination_code_length]
+
+    @property
+    def area_code(self):
+        if self.area_code_length == 0:
+            return None
+        return self.national_significant_number[:self.area_code_length]
+    
+    # ~~~ Methods ~~~
+
+    def get_country_name(self, lang: str) -> str:
         from phonenumbers.geocoder import country_name_for_number
         return country_name_for_number(self, lang=lang)
-    
-    def get_description(self, lang: str = "en") -> str:
+
+    def get_description(self, lang: str) -> str:
         from phonenumbers.geocoder import description_for_number
         return description_for_number(self, lang=lang)
 
-    def get_carrier_name(self) -> str:
+    def get_carrier_name(self, lang: str) -> str:
         from phonenumbers.carrier import name_for_number
-        return name_for_number(self)
-
-    def get_timezones(self) -> Tuple[str, ...]:
-        from phonenumbers.timezone import time_zones_for_number
-        return time_zones_for_number(self)
+        return name_for_number(self, lang=lang)
 
     def format(self, format: PhoneNumberFormat) -> str:
         return pn.format_number(self, format)
@@ -144,3 +180,51 @@ class FrozenPhoneNumber(PhoneNumberMixin):
     raw_input: Optional[str]
     country_code_source: Optional[CountryCodeSource]
     preferred_domestic_carrier_code: Optional[str]
+
+    @cached_property
+    def number_type(self) -> PhoneNumberType:
+        return super().number_type
+
+    @cached_property
+    def region_code(self) -> Optional[str]:
+        return super().region_code
+
+    @cached_property
+    def is_possible(self) -> bool:
+        return super().is_possible
+
+    @cached_property
+    def is_valid(self) -> bool:
+        return super().is_valid
+
+    @cached_property
+    def national_significant_number(self) -> str:
+        return super().national_significant_number
+    
+    @cached_property
+    def national_destination_code_length(self) -> int:
+        return super().national_destination_code_length
+    
+    @cached_property
+    def area_code_length(self) -> int:
+        return super().area_code_length
+
+    @cached_property
+    def timezones(self) -> Tuple[str, ...]:
+        return super().timezones
+
+    @cache
+    def get_country_name(self, lang: str) -> str:
+        return super().get_country_name(lang=lang)
+
+    @cache
+    def get_description(self, lang: str) -> str:
+        return super().get_description(lang=lang)
+
+    @cache
+    def get_carrier_name(self, lang: str) -> str:
+        return super().get_carrier_name(lang=lang)
+
+    @cache
+    def format(self, format: PhoneNumberFormat) -> str:
+        return super().format(format=format)
