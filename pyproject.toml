@@ -37,6 +37,12 @@ path = "src/digitz/__about__.py"
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
+[tool.hatch.envs.hatch-test.scripts]
+run = "pytest{env:HATCH_TEST_ARGS:} {args}"
+run-cov = "coverage run -m pytest{env:HATCH_TEST_ARGS:} {args}"
+cov-combine = "coverage combine"
+cov-report = "coverage report -m"
+
 [tool.hatch.envs.types]
 extra-dependencies = [
   "mypy>=1.0.0",
