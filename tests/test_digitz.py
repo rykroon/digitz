@@ -1,11 +1,22 @@
 import pytest
 
-from digitz import PhoneNumberFormat, PhoneNumberType, PhoneNumber
+from digitz import PhoneNumber
+from digitz.enums import CountryCodeSource, PhoneNumberFormat, PhoneNumberType
+from digitz.exceptions import (
+    InvalidCountryCode,
+    NotANumber,
+    TooLong,
+    TooShortAfterIDD,
+    TooShortNsn,
+)
+
+
+US_EXAMPLE_NUMBER = "+1 (201) 555-0123"
 
 
 @pytest.fixture
 def num_usa() -> PhoneNumber:
-    return PhoneNumber.parse("+1 (201) 555-0123")
+    return PhoneNumber.parse(US_EXAMPLE_NUMBER)
 
 
 @pytest.fixture
@@ -33,6 +44,35 @@ def num_mex():
     return PhoneNumber.parse("+52 200 123 4567")
 
 
+def test_parse():
+    assert isinstance(PhoneNumber.parse(US_EXAMPLE_NUMBER), PhoneNumber)
+
+
+def test_parse_invalid_country_code():
+    with pytest.raises(InvalidCountryCode):
+        PhoneNumber.parse("+999 (201) 555-0123")
+
+
+def test_parse_not_a_number():
+    with pytest.raises(NotANumber):
+        PhoneNumber.parse("foo")
+
+
+def test_parse_too_long():
+    with pytest.raises(TooLong):
+        PhoneNumber.parse("+1 (201) 555-0123012301230123")
+
+
+def test_parse_too_short_after_idd():
+    with pytest.raises(TooShortAfterIDD):
+        PhoneNumber.parse("011", region="US")
+
+
+def test_parse_too_short_nsn():
+    with pytest.raises(TooShortNsn):
+        PhoneNumber.parse("+44 2")
+
+
 def test_national_significant_number(num_usa: PhoneNumber):
     assert num_usa.national_significant_number == "2015550123"
 
@@ -51,6 +91,10 @@ def test_national_destination_code(
     assert num_usa.national_destination_code == "201"
     assert num_usa_invalid.national_destination_code == ""
     assert num_mex.national_destination_code == "200"
+
+
+def test_subscriber_number(num_usa: PhoneNumber):
+    assert num_usa.subscriber_number == "5550123"
 
 
 def test_number_type(num_usa: PhoneNumber):
@@ -93,6 +137,11 @@ def test_get_description(
     assert num_mex.get_description(lang="en") == "Mexico"
 
 
+def test_is_geographical(num_usa: PhoneNumber, num_usa_toll_free: PhoneNumber):
+    assert num_usa.is_geographical() is True
+    assert num_usa_toll_free.is_geographical() is False
+
+
 def test_is_possible(num_usa: PhoneNumber, num_usa_invalid: PhoneNumber):
     assert num_usa.is_possible() is True
     assert num_usa_invalid.is_possible() is False
@@ -131,3 +180,44 @@ def test_e164_format(num_usa: PhoneNumber):
 
 def test_to_rfc3966(num_usa: PhoneNumber):
     assert num_usa.to_rfc3966() == "tel:+1-201-555-0123"
+
+
+def test_replace_country_code(num_usa: PhoneNumber):
+    num = num_usa.replace(country_code=44)
+    assert num.country_code == 44
+
+
+def test_replace_national_number(num_usa: PhoneNumber):
+    num = num_usa.replace(national_number=8002345678)
+    assert num.national_number == 8002345678
+
+
+def test_replace_extension(num_usa: PhoneNumber):
+    num = num_usa.replace(extension="1234")
+    assert num.extension == "1234"
+
+
+def test_replace_leading_italian_zero(num_usa: PhoneNumber):
+    num = num_usa.replace(italian_leading_zero=True)
+    assert num.italian_leading_zero is True
+
+
+def test_replace_number_of_leading_zeros(num_usa: PhoneNumber):
+    num = num_usa.replace(number_of_leading_zeros=1)
+    assert num.number_of_leading_zeros == 1
+
+
+def test_replace_raw_input(num_usa: PhoneNumber):
+    num = num_usa.replace(raw_input="1-800-PYTHON")
+    assert num.raw_input == "1-800-PYTHON"
+
+
+def test_replace_country_code_source(num_usa: PhoneNumber):
+    num = num_usa.replace(country_code_source=CountryCodeSource.UNSPECIFIED)
+    assert num.country_code_source == CountryCodeSource.UNSPECIFIED
+
+
+def test_replace_preferred_domestic_carrier_code(num_usa: PhoneNumber):
+    num = num_usa.replace(preferred_domestic_carrier_code="what")
+    assert num.preferred_domestic_carrier_code == "what"
+
