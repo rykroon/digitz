@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
 from functools import lru_cache, cached_property
-from typing import Optional, Tuple, Type, TypeVar
+from typing import Optional, Tuple, Type, TypeVar, Union
 
 import phonenumbers as pn
 
@@ -13,20 +13,22 @@ from digitz.enums import (
 from digitz.exceptions import (
     InvalidCountryCode, NotANumber, TooLong, TooShortAfterIDD, TooShortNsn
 )
+from digitz.undefined import Undefined, UndefinedType
 
 
-Self = TypeVar("Self", bound="PhoneNumberMixin")
+Self = TypeVar("Self", bound="PhoneNumber")
 
 
-class PhoneNumberMixin(pn.PhoneNumber):
-    country_code: int
-    national_number: int
-    extension: Optional[str]
-    italian_leading_zero: Optional[bool]
-    number_of_leading_zeros: Optional[int]
-    raw_input: Optional[str]
-    country_code_source: Optional[CountryCodeSource]
-    preferred_domestic_carrier_code: Optional[str]
+@dataclass(frozen=True)
+class PhoneNumber(pn.PhoneNumber):
+    country_code: int = 0
+    national_number: int = 0
+    extension: Optional[str] = None
+    italian_leading_zero: Optional[bool] = None
+    number_of_leading_zeros: Optional[int] = None
+    raw_input: Optional[str] = None
+    country_code_source: Optional[CountryCodeSource] = CountryCodeSource.UNSPECIFIED
+    preferred_domestic_carrier_code: Optional[str] = None
 
     @classmethod
     def parse(
@@ -71,11 +73,11 @@ class PhoneNumberMixin(pn.PhoneNumber):
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
 
-    @property
+    @cached_property
     def national_destination_code_length(self) -> int:
         return pn.length_of_national_destination_code(self)
 
-    @property
+    @cached_property
     def national_significant_number(self) -> str:
         return pn.national_significant_number(self)
 
@@ -84,21 +86,31 @@ class PhoneNumberMixin(pn.PhoneNumber):
         return self.national_significant_number[:self.national_destination_code_length]
 
     @property
+    def subscriber_number(self):
+        return self.national_significant_number[self.national_destination_code_length:]
+
+    @cached_property
     def number_type(self) -> PhoneNumberType:
         return PhoneNumberType(pn.number_type(self))
 
-    @property
+    @cached_property
     def region_code(self) -> Optional[str]:
         return pn.region_code_for_number(self)
 
-    @property
+    @cached_property
     def timezones(self) -> Tuple[str, ...]:
         from phonenumbers.timezone import time_zones_for_number
         return time_zones_for_number(self)
 
+    @lru_cache
+    def is_geographical(self) -> bool:
+        return pn.is_number_geographical(self)
+
+    @lru_cache
     def is_possible(self) -> bool:
         return pn.is_possible_number(self)
 
+    @lru_cache
     def is_valid(self) -> bool:
         return pn.is_valid_number(self)
 
@@ -108,18 +120,22 @@ class PhoneNumberMixin(pn.PhoneNumber):
     def is_voip(self) -> bool:
         return self.number_type == PhoneNumberType.VOIP
 
+    @lru_cache
     def get_carrier_name(self, lang: str) -> str:
         from phonenumbers.carrier import name_for_number
         return name_for_number(self, lang=lang)
 
+    @lru_cache
     def get_country_name(self, lang: str) -> str:
         from phonenumbers.geocoder import country_name_for_number
         return country_name_for_number(self, lang=lang)
 
+    @lru_cache
     def get_description(self, lang: str) -> str:
         from phonenumbers.geocoder import description_for_number
         return description_for_number(self, lang=lang)
 
+    @lru_cache
     def format(self, format: PhoneNumberFormat) -> str:
         return pn.format_number(self, format)
 
@@ -135,74 +151,49 @@ class PhoneNumberMixin(pn.PhoneNumber):
     def to_rfc3966(self) -> str:
         return self.format(PhoneNumberFormat.RFC3966)
 
+    def replace(
+        self: Self,
+        *,
+        country_code: Union[int, UndefinedType] = Undefined,
+        national_number: Union[int, UndefinedType] = Undefined,
+        extension: Union[Optional[str], UndefinedType] = Undefined,
+        italian_leading_zero: Union[Optional[bool], UndefinedType] = Undefined,
+        number_of_leading_zeros: Union[Optional[int], UndefinedType] = Undefined,
+        raw_input: Union[Optional[str], UndefinedType] = Undefined,
+        country_code_source: Union[Optional[CountryCodeSource], UndefinedType] = Undefined,
+        preferred_domestic_carrier_code: Union[Optional[str], UndefinedType] = Undefined,
+    ) -> Self:
+        if country_code is Undefined:
+            country_code = self.country_code
 
-@dataclass
-class PhoneNumber(PhoneNumberMixin):
-    """A phone number."""
+        if national_number is Undefined:
+            national_number = self.national_number
 
-    country_code: int = 0
-    national_number: int = 0
-    extension: Optional[str] = None
-    italian_leading_zero: Optional[bool] = None
-    number_of_leading_zeros: Optional[int] = None
-    raw_input: Optional[str] = None
-    country_code_source: Optional[CountryCodeSource] = CountryCodeSource.UNSPECIFIED
-    preferred_domestic_carrier_code: Optional[str] = None
+        if extension is Undefined:
+            extension = self.extension
 
+        if italian_leading_zero is Undefined:
+            italian_leading_zero = self.italian_leading_zero
 
-@dataclass(frozen=True)
-class FrozenPhoneNumber(PhoneNumberMixin):
-    """A frozen phone number."""
+        if number_of_leading_zeros is Undefined:
+            number_of_leading_zeros = self.number_of_leading_zeros
 
-    country_code: int
-    national_number: int
-    extension: Optional[str]
-    italian_leading_zero: Optional[bool]
-    number_of_leading_zeros: Optional[int]
-    raw_input: Optional[str]
-    country_code_source: Optional[CountryCodeSource]
-    preferred_domestic_carrier_code: Optional[str]
+        if raw_input is Undefined:
+            raw_input = self.raw_input
 
-    @cached_property
-    def national_destination_code_length(self) -> int:
-        return super().national_destination_code_length
+        if country_code_source is Undefined:
+            country_code_source = self.country_code_source
 
-    @cached_property
-    def national_significant_number(self) -> str:
-        return super().national_significant_number
+        if preferred_domestic_carrier_code is Undefined:
+            preferred_domestic_carrier_code = self.preferred_domestic_carrier_code
 
-    @cached_property
-    def number_type(self) -> PhoneNumberType:
-        return super().number_type
-
-    @cached_property
-    def region_code(self) -> Optional[str]:
-        return super().region_code
-
-    @cached_property
-    def timezones(self) -> Tuple[str, ...]:
-        return super().timezones
-
-    @lru_cache
-    def is_possible(self) -> bool:
-        return super().is_possible()
-
-    @lru_cache
-    def is_valid(self) -> bool:
-        return super().is_valid()
-
-    @lru_cache
-    def get_carrier_name(self, lang: str) -> str:
-        return super().get_carrier_name(lang=lang)
-
-    @lru_cache
-    def get_country_name(self, lang: str) -> str:
-        return super().get_country_name(lang=lang)
-
-    @lru_cache
-    def get_description(self, lang: str) -> str:
-        return super().get_description(lang=lang)
-
-    @lru_cache
-    def format(self, format: PhoneNumberFormat) -> str:
-        return super().format(format=format)
+        return type(self)(
+            country_code=country_code,
+            national_number=national_number,
+            extension=extension,
+            italian_leading_zero=italian_leading_zero,
+            number_of_leading_zeros=number_of_leading_zeros,
+            raw_input=raw_input,
+            country_code_source=country_code_source,
+            preferred_domestic_carrier_code=preferred_domestic_carrier_code,
+        )
