@@ -1,7 +1,7 @@
 import pytest
 
 from digitz import PhoneNumber
-from digitz.enums import CountryCodeSource, PhoneNumberFormat, PhoneNumberType
+from digitz.enums import PhoneNumberFormat, PhoneNumberType
 from digitz.exceptions import (
     InvalidCountryCode,
     NotANumber,
@@ -9,6 +9,8 @@ from digitz.exceptions import (
     TooShortAfterIDD,
     TooShortNsn,
 )
+
+from digitz.undefined import Undefined
 
 
 US_EXAMPLE_NUMBER = "+1 (201) 555-0123"
@@ -138,28 +140,28 @@ def test_get_description(
 
 
 def test_is_geographical(num_usa: PhoneNumber, num_usa_toll_free: PhoneNumber):
-    assert num_usa.is_geographical() is True
-    assert num_usa_toll_free.is_geographical() is False
+    assert num_usa.is_geographical is True
+    assert num_usa_toll_free.is_geographical is False
 
 
 def test_is_possible(num_usa: PhoneNumber, num_usa_invalid: PhoneNumber):
-    assert num_usa.is_possible() is True
-    assert num_usa_invalid.is_possible() is False
+    assert num_usa.is_possible is True
+    assert num_usa_invalid.is_possible is False
 
 
 def test_is_valid(num_usa: PhoneNumber, num_usa_invalid: PhoneNumber):
-    assert num_usa.is_valid() is True
-    assert num_usa_invalid.is_valid() is False
+    assert num_usa.is_valid is True
+    assert num_usa_invalid.is_valid is False
 
 
 def test_is_toll_free(num_usa: PhoneNumber, num_usa_toll_free: PhoneNumber):
-    assert num_usa_toll_free.is_toll_free() is True
-    assert num_usa.is_toll_free() is False
+    assert num_usa_toll_free.is_toll_free is True
+    assert num_usa.is_toll_free is False
 
 
 def test_is_voip(num_usa: PhoneNumber, num_usa_voip: PhoneNumber):
-    assert num_usa_voip.is_voip() is True
-    assert num_usa.is_voip() is False
+    assert num_usa_voip.is_voip is True
+    assert num_usa.is_voip is False
 
 
 def test_format(num_usa: PhoneNumber):
@@ -207,17 +209,6 @@ def test_replace_number_of_leading_zeros(num_usa: PhoneNumber):
     assert num.number_of_leading_zeros == 1
 
 
-def test_replace_raw_input(num_usa: PhoneNumber):
-    num = num_usa.replace(raw_input="1-800-PYTHON")
-    assert num.raw_input == "1-800-PYTHON"
-
-
-def test_replace_country_code_source(num_usa: PhoneNumber):
-    num = num_usa.replace(country_code_source=CountryCodeSource.UNSPECIFIED)
-    assert num.country_code_source == CountryCodeSource.UNSPECIFIED
-
-
-def test_replace_preferred_domestic_carrier_code(num_usa: PhoneNumber):
-    num = num_usa.replace(preferred_domestic_carrier_code="what")
-    assert num.preferred_domestic_carrier_code == "what"
-
+def test_undefined():
+    assert bool(Undefined) is False
+    assert repr(Undefined) == "Undefined"
