@@ -1,3 +1,4 @@
+from dataclasses import FrozenInstanceError
 import pytest
 
 from digitz import PhoneNumber
@@ -9,8 +10,6 @@ from digitz.exceptions import (
     TooShortAfterIDD,
     TooShortNsn,
 )
-
-from digitz.undefined import Undefined
 
 
 US_EXAMPLE_NUMBER = "+1 (201) 555-0123"
@@ -44,6 +43,11 @@ def num_can():
 @pytest.fixture
 def num_mex():
     return PhoneNumber.parse("+52 200 123 4567")
+
+
+@pytest.fixture
+def num_italy():
+    return PhoneNumber.parse("+39 02 1234 5678")
 
 
 def test_parse():
@@ -164,6 +168,18 @@ def test_is_voip(num_usa: PhoneNumber, num_usa_voip: PhoneNumber):
     assert num_usa.is_voip is False
 
 
+# def test_is_number_match(num_usa: PhoneNumber, num_can: PhoneNumber):
+#     # assert num_usa.is_number_match(num_can) is False
+#     assert num_usa.is_number_match(num_can.to_e164()) is False
+
+#     assert num_usa.is_number_match(num_usa) is True
+#     assert num_usa.is_number_match(num_usa.to_e164())
+
+#     num_usa_raw = PhoneNumber.parse(num_usa.to_national(), region="US", keep_raw_input=True)
+#     assert num_usa.is_number_match(num_usa_raw) is True
+#     assert num_usa.is_number_match(num_usa_raw.to_e164())
+
+
 def test_format(num_usa: PhoneNumber):
     assert num_usa.format(format=PhoneNumberFormat.E164) == "+12015550123"
 
@@ -209,6 +225,11 @@ def test_replace_number_of_leading_zeros(num_usa: PhoneNumber):
     assert num.number_of_leading_zeros == 1
 
 
-def test_undefined():
-    assert bool(Undefined) is False
-    assert repr(Undefined) == "Undefined"
+def test_clear(num_usa: PhoneNumber):
+    with pytest.raises(FrozenInstanceError):
+        num_usa.clear()
+
+
+def test_merge_from(num_usa: PhoneNumber, num_can: PhoneNumber):
+    with pytest.raises(FrozenInstanceError):
+        num_usa.merge_from(num_can)

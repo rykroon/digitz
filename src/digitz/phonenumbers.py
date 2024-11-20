@@ -13,28 +13,18 @@ from digitz.enums import (
 from digitz.exceptions import (
     InvalidCountryCode, NotANumber, TooLong, TooShortAfterIDD, TooShortNsn
 )
-from digitz.undefined import Undefined, UndefinedType
 
 
 Self = TypeVar("Self", bound="PhoneNumber")
 
 
-"""
-Ideas
-- Might need to do additional thinking on whether or not compatibility of the Java port is necesary.
-
-"""
-
-
 @dataclass(frozen=True)
 class PhoneNumber(pn.PhoneNumber):
-    country_code: int = 0
-    national_number: int = 0
-    extension: Optional[str] = None
-    italian_leading_zero: Optional[bool] = None
-    number_of_leading_zeros: Optional[int] = None
-
-    # non-essential fields.
+    country_code: int
+    national_number: int
+    extension: str = ""
+    italian_leading_zero: bool = False
+    number_of_leading_zeros: int = 1
     raw_input: Optional[str] = field(default=None, repr=False)
     country_code_source: CountryCodeSource = CountryCodeSource.UNSPECIFIED
     preferred_domestic_carrier_code: Optional[str] = None
@@ -71,6 +61,21 @@ class PhoneNumber(pn.PhoneNumber):
             else:
                 raise e
 
+        if numobj.country_code is None:
+            numobj.country_code = 0
+
+        if numobj.national_number is None:
+            numobj.national_number = 0
+
+        if numobj.extension is None:
+            numobj.extension = ""
+
+        if numobj.italian_leading_zero is None:
+            numobj.italian_leading_zero = False
+
+        if numobj.number_of_leading_zeros is None:
+            numobj.number_of_leading_zeros = 1
+
         return cls(
             country_code=numobj.country_code,
             national_number=numobj.national_number,
@@ -90,12 +95,12 @@ class PhoneNumber(pn.PhoneNumber):
     def national_significant_number(self) -> str:
         return pn.national_significant_number(self)
 
-    @cached_property
+    @property
     def national_destination_code(self) -> str:
         return self.national_significant_number[:self.national_destination_code_length]
 
-    @cached_property
-    def subscriber_number(self):
+    @property
+    def subscriber_number(self) -> str:
         return self.national_significant_number[self.national_destination_code_length:]
 
     @cached_property
@@ -123,13 +128,17 @@ class PhoneNumber(pn.PhoneNumber):
     def is_valid(self) -> bool:
         return pn.is_valid_number(self)
 
-    @cached_property
+    @property
     def is_toll_free(self) -> bool:
         return self.number_type == PhoneNumberType.TOLL_FREE
 
-    @cached_property
+    @property
     def is_voip(self) -> bool:
         return self.number_type == PhoneNumberType.VOIP
+
+    def is_number_match(self, other: Union[str, pn.PhoneNumber], /) -> int:
+        # this function returns an enum that needs to be interpreted.
+        return pn.is_number_match(self, other)
 
     @lru_cache
     def get_carrier_name(self, lang: str) -> str:
@@ -162,34 +171,28 @@ class PhoneNumber(pn.PhoneNumber):
     def to_rfc3966(self) -> str:
         return self.format(PhoneNumberFormat.RFC3966)
 
-    def clear(self):
-        ...
-
-    def merge_from(self):
-        ...
-
     def replace(
         self: Self,
         *,
-        country_code: Union[int, UndefinedType] = Undefined,
-        national_number: Union[int, UndefinedType] = Undefined,
-        extension: Union[Optional[str], UndefinedType] = Undefined,
-        italian_leading_zero: Union[bool, UndefinedType] = Undefined,
-        number_of_leading_zeros: Union[Optional[int], UndefinedType] = Undefined,
+        country_code: Optional[int] = None,
+        national_number: Optional[int] = None,
+        extension: Optional[str] = None,
+        italian_leading_zero: Optional[bool] = None,
+        number_of_leading_zeros: Optional[int] = None,
     ) -> Self:
-        if country_code is Undefined:
+        if country_code is None:
             country_code = self.country_code
 
-        if national_number is Undefined:
+        if national_number is None:
             national_number = self.national_number
 
-        if extension is Undefined:
+        if extension is None:
             extension = self.extension
 
-        if italian_leading_zero is Undefined:
+        if italian_leading_zero is None:
             italian_leading_zero = self.italian_leading_zero
 
-        if number_of_leading_zeros is Undefined:
+        if number_of_leading_zeros is None:
             number_of_leading_zeros = self.number_of_leading_zeros
 
         return type(self)(
