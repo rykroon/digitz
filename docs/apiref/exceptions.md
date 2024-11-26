@@ -1,6 +1,5 @@
 # Exceptions
 
-
 ::: digitz.exceptions.InvalidCountryCode
 
 ::: digitz.exceptions.NotANumber
