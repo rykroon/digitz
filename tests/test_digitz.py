@@ -96,26 +96,26 @@ def num_ita_pn() -> pn.PhoneNumber:
 
 
 class TestParse:
-    def test_success(self):
+    def test_success(self) -> None:
         assert isinstance(PhoneNumber.parse(USA_EXAMPLE_NUMBER), PhoneNumber)
 
-    def test_invalid_country_code(self):
+    def test_invalid_country_code(self) -> None:
         with pytest.raises(InvalidCountryCode):
             PhoneNumber.parse("+999 (201) 555-0123")
 
-    def test_not_a_number(self):
+    def test_not_a_number(self) -> None:
         with pytest.raises(NotANumber):
             PhoneNumber.parse("foo")
 
-    def test_too_long(self):
+    def test_too_long(self) -> None:
         with pytest.raises(TooLong):
             PhoneNumber.parse("+1 (201) 555-0123012301230123")
 
-    def test_too_short_after_idd(self):
+    def test_too_short_after_idd(self) -> None:
         with pytest.raises(TooShortAfterIDD):
             PhoneNumber.parse("011", region="US")
 
-    def test_too_short_nsn(self):
+    def test_too_short_nsn(self) -> None:
         with pytest.raises(TooShortNsn):
             PhoneNumber.parse("+44 2")
 
@@ -129,7 +129,7 @@ def test_national_significant_number(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.national_significant_number == pn.national_significant_number(
         num_usa_pn
     )
@@ -157,7 +157,7 @@ def test_national_destination_code_length(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert (
         num_usa.national_destination_code_length
         == pn.length_of_national_destination_code(num_usa_pn)
@@ -195,7 +195,7 @@ def test_national_destination_code(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert (
         num_usa.national_destination_code
         == pn.national_significant_number(num_usa_pn)[
@@ -239,7 +239,7 @@ def test_subscriber_number(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert (
         num_usa.subscriber_number
         == pn.national_significant_number(num_usa_pn)[
@@ -287,7 +287,7 @@ def test_number_type(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.number_type == pn.number_type(num_usa_pn)
     assert num_usa_toll_free.number_type == pn.number_type(num_usa_toll_free_pn)
     assert num_usa_voip.number_type == pn.number_type(num_usa_voip_pn)
@@ -308,7 +308,7 @@ def test_region_code(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.region_code == pn.region_code_for_number(num_usa_pn)
     assert num_usa_invalid.region_code == pn.region_code_for_number(num_usa_invalid_pn)
     assert num_can.region_code == pn.region_code_for_number(num_can_pn)
@@ -327,7 +327,7 @@ def test_timezones(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.timezones == time_zones_for_number(num_usa_pn)
     assert num_usa_toll_free.timezones == time_zones_for_number(num_usa_toll_free_pn)
     assert num_can.timezones == time_zones_for_number(num_can_pn)
@@ -344,7 +344,7 @@ def test_get_carrier_name(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.get_carrier_name(lang="en") == name_for_number(num_usa_pn, lang="en")
     assert num_can.get_carrier_name(lang="en") == name_for_number(num_can_pn, lang="en")
     assert num_mex.get_carrier_name(lang="en") == name_for_number(num_mex_pn, lang="en")
@@ -360,7 +360,7 @@ def test_get_country_name(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.get_country_name(lang="en") == country_name_for_number(
         num_usa_pn, lang="en"
     )
@@ -384,7 +384,7 @@ def test_get_description(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.get_description(lang="en") == description_for_number(
         num_usa_pn, lang="en"
     )
@@ -410,7 +410,7 @@ def test_is_geographical(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.is_geographical == pn.is_number_geographical(num_usa_pn)
     assert num_usa_toll_free.is_geographical == pn.is_number_geographical(
         num_usa_toll_free_pn
@@ -433,7 +433,7 @@ def test_is_possible(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.is_possible == pn.is_possible_number(num_usa_pn)
     assert num_usa_toll_free.is_possible == pn.is_possible_number(num_usa_toll_free_pn)
     assert num_usa_invalid.is_possible == pn.is_possible_number(num_usa_invalid_pn)
@@ -455,7 +455,7 @@ def test_is_valid(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.is_valid == pn.is_valid_number(num_usa_pn)
     assert num_usa_toll_free.is_valid == pn.is_valid_number(num_usa_toll_free_pn)
     assert num_usa_invalid.is_valid == pn.is_valid_number(num_usa_invalid_pn)
@@ -469,7 +469,7 @@ def test_is_toll_free(
     num_usa_pn: pn.PhoneNumber,
     num_usa_toll_free: PhoneNumber,
     num_usa_toll_free_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa_toll_free.is_toll_free == (
         pn.number_type(num_usa_toll_free_pn) == pn.PhoneNumberType.TOLL_FREE
     )
@@ -483,7 +483,7 @@ def test_is_voip(
     num_usa_pn: pn.PhoneNumber,
     num_usa_voip: PhoneNumber,
     num_usa_voip_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa_voip.is_voip == (
         pn.number_type(num_usa_voip_pn) == pn.PhoneNumberType.VOIP
     )
@@ -499,7 +499,7 @@ def test_is_match(
     num_mex_pn: pn.PhoneNumber,
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
-):
+) -> None:
     assert num_usa.get_match_type(num_usa_pn) == pn.is_number_match(num_usa, num_usa_pn)
     assert num_can.get_match_type(num_can_pn) == pn.is_number_match(num_can, num_can_pn)
     assert num_mex.get_match_type(num_mex_pn) == pn.is_number_match(num_mex, num_mex_pn)
@@ -518,7 +518,7 @@ class TestFormat:
         num_mex_pn: pn.PhoneNumber,
         num_ita: PhoneNumber,
         num_ita_pn: pn.PhoneNumber,
-    ):
+    ) -> None:
         assert num_usa.to_international() == pn.format_number(
             num_usa_pn, pn.PhoneNumberFormat.INTERNATIONAL
         )
@@ -542,7 +542,7 @@ class TestFormat:
         num_mex_pn: pn.PhoneNumber,
         num_ita: PhoneNumber,
         num_ita_pn: pn.PhoneNumber,
-    ):
+    ) -> None:
         assert num_usa.to_national() == pn.format_number(num_usa_pn, pn.PhoneNumberFormat.NATIONAL)
         assert num_can.to_national() == pn.format_number(num_can_pn, pn.PhoneNumberFormat.NATIONAL)
         assert num_mex.to_national() == pn.format_number(num_mex_pn, pn.PhoneNumberFormat.NATIONAL)
@@ -558,7 +558,7 @@ class TestFormat:
         num_mex_pn: pn.PhoneNumber,
         num_ita: PhoneNumber,
         num_ita_pn: pn.PhoneNumber,
-    ):
+    ) -> None:
         assert num_usa.to_e164() == pn.format_number(num_usa_pn, pn.PhoneNumberFormat.E164)
         assert num_can.to_e164() == pn.format_number(num_can_pn, pn.PhoneNumberFormat.E164)
         assert num_mex.to_e164() == pn.format_number(num_mex_pn, pn.PhoneNumberFormat.E164)
@@ -574,7 +574,7 @@ class TestFormat:
         num_mex_pn: pn.PhoneNumber,
         num_ita: PhoneNumber,
         num_ita_pn: pn.PhoneNumber,
-    ):
+    ) -> None:
         assert num_usa.to_rfc3966() == pn.format_number(num_usa_pn, pn.PhoneNumberFormat.RFC3966)
         assert num_can.to_rfc3966() == pn.format_number(num_can_pn, pn.PhoneNumberFormat.RFC3966)
         assert num_mex.to_rfc3966() == pn.format_number(num_mex_pn, pn.PhoneNumberFormat.RFC3966)
@@ -582,32 +582,32 @@ class TestFormat:
 
 
 class TestReplace:
-    def test_country_code(self, num_usa: PhoneNumber):
+    def test_country_code(self, num_usa: PhoneNumber) -> None:
         num = num_usa.replace(country_code=44)
         assert num.country_code == 44
 
-    def test_national_number(self, num_usa: PhoneNumber):
+    def test_national_number(self, num_usa: PhoneNumber) -> None:
         num = num_usa.replace(national_number=8002345678)
         assert num.national_number == 8002345678
 
-    def test_extension(self, num_usa: PhoneNumber):
+    def test_extension(self, num_usa: PhoneNumber) -> None:
         num = num_usa.replace(extension="1234")
         assert num.extension == "1234"
 
-    def test_leading_italian_zero(self, num_usa: PhoneNumber):
+    def test_leading_italian_zero(self, num_usa: PhoneNumber) -> None:
         num = num_usa.replace(italian_leading_zero=True)
         assert num.italian_leading_zero is True
 
-    def test_number_of_leading_zeros(self, num_usa: PhoneNumber):
+    def test_number_of_leading_zeros(self, num_usa: PhoneNumber) -> None:
         num = num_usa.replace(number_of_leading_zeros=1)
         assert num.number_of_leading_zeros == 1
 
 
-def test_clear(num_usa: PhoneNumber):
+def test_clear(num_usa: PhoneNumber) -> None:
     with pytest.raises(FrozenInstanceError):
         num_usa.clear()
 
 
-def test_merge_from(num_usa: PhoneNumber, num_can: PhoneNumber):
+def test_merge_from(num_usa: PhoneNumber, num_can: PhoneNumber) -> None:
     with pytest.raises(FrozenInstanceError):
         num_usa.merge_from(num_can)
