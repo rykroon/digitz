@@ -41,7 +41,7 @@ def num_usa_toll_free() -> PhoneNumber:
 
 
 @pytest.fixture
-def num_usa_toll_free_pn() -> pn.PhoneMetadata:
+def num_usa_toll_free_pn() -> pn.PhoneNumber:
     return pn.parse(USA_TOLL_FREE_EXAMPLE_NUMBER)
 
 
@@ -490,7 +490,7 @@ def test_is_voip(
     assert num_usa.is_voip == (pn.number_type(num_usa_pn) == pn.PhoneNumberType.VOIP)
 
 
-def test_is_number_match(
+def test_is_match(
     num_usa: PhoneNumber,
     num_usa_pn: pn.PhoneNumber,
     num_can: PhoneNumber,
@@ -500,10 +500,10 @@ def test_is_number_match(
     num_ita: PhoneNumber,
     num_ita_pn: pn.PhoneNumber,
 ):
-    assert num_usa.is_number_match(num_usa_pn) == pn.is_number_match(num_usa, num_usa_pn)
-    assert num_can.is_number_match(num_can_pn) == pn.is_number_match(num_can, num_can_pn)
-    assert num_mex.is_number_match(num_mex_pn) == pn.is_number_match(num_mex, num_mex_pn)
-    assert num_ita.is_number_match(num_ita_pn) == pn.is_number_match(num_ita, num_ita_pn)
+    assert num_usa.get_match_type(num_usa_pn) == pn.is_number_match(num_usa, num_usa_pn)
+    assert num_can.get_match_type(num_can_pn) == pn.is_number_match(num_can, num_can_pn)
+    assert num_mex.get_match_type(num_mex_pn) == pn.is_number_match(num_mex, num_mex_pn)
+    assert num_ita.get_match_type(num_ita_pn) == pn.is_number_match(num_ita, num_ita_pn)
 
 
 class TestFormat:
