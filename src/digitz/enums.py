@@ -12,6 +12,16 @@ class CountryCodeSource(IntEnum):
     FROM_DEFAULT_COUNTRY = pn.CountryCodeSource.FROM_DEFAULT_COUNTRY
 
 
+class MatchType(IntEnum):
+    """Enum for phone number match types."""
+
+    EXACT_MATCH = pn.MatchType.EXACT_MATCH
+    NOT_A_NUMBER = pn.MatchType.NOT_A_NUMBER
+    NO_MATCH = pn.MatchType.NO_MATCH
+    NSN_MATCH = pn.MatchType.NSN_MATCH
+    SHORT_NSN_MATCH = pn.MatchType.SHORT_NSN_MATCH
+
+
 class NumberParseErrorType(IntEnum):
     """Enum for phone number parsing error types."""
 

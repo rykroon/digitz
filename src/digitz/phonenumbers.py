@@ -8,10 +8,18 @@ from typing import Optional, Tuple, Type, TypeVar, Union
 import phonenumbers as pn
 
 from digitz.enums import (
-    CountryCodeSource, NumberParseErrorType, PhoneNumberFormat,  PhoneNumberType
+    CountryCodeSource,
+    MatchType,
+    NumberParseErrorType,
+    PhoneNumberFormat,
+    PhoneNumberType,
 )
 from digitz.exceptions import (
-    InvalidCountryCode, NotANumber, TooLong, TooShortAfterIDD, TooShortNsn
+    InvalidCountryCode,
+    NotANumber,
+    TooLong,
+    TooShortAfterIDD,
+    TooShortNsn,
 )
 
 
@@ -20,11 +28,11 @@ Self = TypeVar("Self", bound="PhoneNumber")
 
 @dataclass(frozen=True)
 class PhoneNumber(pn.PhoneNumber):
-    country_code: int
-    national_number: int
-    extension: str = ""
+    country_code: Optional[int]
+    national_number: Optional[int]
+    extension: Optional[str] = None
     italian_leading_zero: bool = False
-    number_of_leading_zeros: int = 1
+    number_of_leading_zeros: Optional[int] = None
     raw_input: Optional[str] = field(default=None, repr=False)
     country_code_source: CountryCodeSource = CountryCodeSource.UNSPECIFIED
     preferred_domestic_carrier_code: Optional[str] = None
@@ -33,14 +41,13 @@ class PhoneNumber(pn.PhoneNumber):
     def parse(
         cls: Type[Self],
         number: str,
-        /, *,
+        /,
+        *,
         region: Optional[str] = None,
-        keep_raw_input: bool = False
+        keep_raw_input: bool = False,
     ) -> Self:
         try:
-            numobj = pn.parse(
-                number, region=region, keep_raw_input=keep_raw_input
-            )
+            numobj = pn.parse(number, region=region, keep_raw_input=keep_raw_input)
 
         except pn.NumberParseException as e:
             if e.error_type == NumberParseErrorType.INVALID_COUNTRY_CODE:
@@ -59,22 +66,7 @@ class PhoneNumber(pn.PhoneNumber):
                 raise TooShortNsn(e._msg) from e
 
             else:
-                raise e
-
-        if numobj.country_code is None:
-            numobj.country_code = 0
-
-        if numobj.national_number is None:
-            numobj.national_number = 0
-
-        if numobj.extension is None:
-            numobj.extension = ""
-
-        if numobj.italian_leading_zero is None:
-            numobj.italian_leading_zero = False
-
-        if numobj.number_of_leading_zeros is None:
-            numobj.number_of_leading_zeros = 1
+                raise e  # pragma: no cover
 
         return cls(
             country_code=numobj.country_code,
@@ -97,11 +89,11 @@ class PhoneNumber(pn.PhoneNumber):
 
     @property
     def national_destination_code(self) -> str:
-        return self.national_significant_number[:self.national_destination_code_length]
+        return self.national_significant_number[: self.national_destination_code_length]
 
     @property
     def subscriber_number(self) -> str:
-        return self.national_significant_number[self.national_destination_code_length:]
+        return self.national_significant_number[self.national_destination_code_length :]
 
     @cached_property
     def number_type(self) -> PhoneNumberType:
@@ -114,6 +106,7 @@ class PhoneNumber(pn.PhoneNumber):
     @cached_property
     def timezones(self) -> Tuple[str, ...]:
         from phonenumbers.timezone import time_zones_for_number
+
         return time_zones_for_number(self)
 
     @cached_property
@@ -136,23 +129,37 @@ class PhoneNumber(pn.PhoneNumber):
     def is_voip(self) -> bool:
         return self.number_type == PhoneNumberType.VOIP
 
-    def is_number_match(self, other: Union[str, pn.PhoneNumber], /) -> int:
-        # this function returns an enum that needs to be interpreted.
-        return pn.is_number_match(self, other)
+    def get_match_type(self, other: Union[str, pn.PhoneNumber], /) -> MatchType:
+        return MatchType(pn.is_number_match(self, other))
+
+    def is_no_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+        return self.get_match_type(other) == MatchType.NO_MATCH
+
+    def is_short_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+        return self.get_match_type(other) == MatchType.SHORT_NSN_MATCH
+
+    def is_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+        return self.get_match_type(other) == MatchType.NSN_MATCH
+
+    def is_exact_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+        return self.get_match_type(other) == MatchType.EXACT_MATCH
 
     @lru_cache
     def get_carrier_name(self, lang: str) -> str:
         from phonenumbers.carrier import name_for_number
+
         return name_for_number(self, lang=lang)
 
     @lru_cache
     def get_country_name(self, lang: str) -> str:
         from phonenumbers.geocoder import country_name_for_number
+
         return country_name_for_number(self, lang=lang)
 
     @lru_cache
     def get_description(self, lang: str) -> str:
         from phonenumbers.geocoder import description_for_number
+
         return description_for_number(self, lang=lang)
 
     @lru_cache
