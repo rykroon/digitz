@@ -1,36 +1,32 @@
 # API Reference
 
 ::: digitz.PhoneNumber
-___
-
-## Class Methods
-::: digitz.PhoneNumber.parse
-
-## Properties
-::: digitz.PhoneNumber.national_destination_code_length
-::: digitz.PhoneNumber.national_significant_number
-::: digitz.PhoneNumber.national_destination_code
-::: digitz.PhoneNumber.subscriber_number
-::: digitz.PhoneNumber.number_type
-::: digitz.PhoneNumber.region_code
-::: digitz.PhoneNumber.timezones
-::: digitz.PhoneNumber.is_geographical
-::: digitz.PhoneNumber.is_possible
-::: digitz.PhoneNumber.is_valid
-::: digitz.PhoneNumber.is_toll_free
-::: digitz.PhoneNumber.is_voip
-
-## Methods
-::: digitz.PhoneNumber.get_match_type
-::: digitz.PhoneNumber.is_no_match
-::: digitz.PhoneNumber.is_short_nsn_match
-::: digitz.PhoneNumber.is_nsn_match
-::: digitz.PhoneNumber.is_exact_match
-::: digitz.PhoneNumber.get_carrier_name
-::: digitz.PhoneNumber.get_country_name
-::: digitz.PhoneNumber.get_description
-::: digitz.PhoneNumber.format
-::: digitz.PhoneNumber.to_e164
-::: digitz.PhoneNumber.to_international
-::: digitz.PhoneNumber.to_national
-::: digitz.PhoneNumber.to_rfc3966
+    handler: python
+    options:
+        members:
+        - parse
+        - national_destination_code_length
+        - national_significant_number
+		- national_destination_code
+		- subscriber_number
+		- number_type
+		- region_code
+		- timezones
+		- is_geographical
+		- is_possible
+		- is_valid
+		- is_toll_free
+		- is_voip
+		- get_match_type
+		- is_no_match
+		- is_short_nsn_match
+		- is_nsn_match
+		- is_exact_match
+		- get_carrier_name
+		- get_country_name
+		- get_description
+		- format
+		- to_e164
+		- to_international
+		- to_national
+		- to_rfc3966
