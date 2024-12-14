@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass, field
-from functools import lru_cache, cached_property
+from functools import lru_cache, cached_property, wraps
 from typing import Optional, Tuple, Type, TypeVar, Union
 
 import phonenumbers as pn
@@ -26,6 +26,18 @@ from digitz.exceptions import (
 
 
 Self = TypeVar("Self", bound="PhoneNumber")
+
+
+def number_type_property(phone_number_type: PhoneNumberType) -> property:
+    """Return a property that returns whether the phone number is of the given type."""
+
+    def fget(self: Self) -> bool:
+        return self.number_type == phone_number_type
+
+    return property(
+        fget=fget,
+        doc=f"Return whether the phone number type is {phone_number_type.name.lower()}."
+    )
 
 
 @dataclass(frozen=True)
@@ -148,15 +160,19 @@ class PhoneNumber(pn.PhoneNumber):
         """Return whether the phone number is valid."""
         return pn.is_valid_number(self)
 
-    @property
-    def is_toll_free(self) -> bool:
-        """Return whether the phone number is toll-free."""
-        return self.number_type == PhoneNumberType.TOLL_FREE
-
-    @property
-    def is_voip(self) -> bool:
-        """Return whether the phone number is VoIP."""
-        return self.number_type == PhoneNumberType.VOIP
+    # Number type properties
+    is_fixed_line = number_type_property(PhoneNumberType.FIXED_LINE)
+    is_mobile = number_type_property(PhoneNumberType.MOBILE)
+    is_fixed_line_or_mobile = number_type_property(PhoneNumberType.FIXED_LINE_OR_MOBILE)
+    is_toll_free = number_type_property(PhoneNumberType.TOLL_FREE)
+    is_premium_rate = number_type_property(PhoneNumberType.PREMIUM_RATE)
+    is_shared_cost = number_type_property(PhoneNumberType.SHARED_COST)
+    is_voip = number_type_property(PhoneNumberType.VOIP)
+    is_personal_number = number_type_property(PhoneNumberType.PERSONAL_NUMBER)
+    is_pager = number_type_property(PhoneNumberType.PAGER)
+    is_uan = number_type_property(PhoneNumberType.UAN)
+    is_voicemail = number_type_property(PhoneNumberType.VOICEMAIL)
+    is_unknown = number_type_property(PhoneNumberType.UNKNOWN)
 
     def match(self, other: Union[str, pn.PhoneNumber], /) -> MatchType:
         """Return the match type of the phone number."""
