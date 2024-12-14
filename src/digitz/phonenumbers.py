@@ -79,6 +79,9 @@ class PhoneNumber(pn.PhoneNumber):
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
 
+    def __str__(self) -> str:
+        return self.to_e164()
+
     @cached_property
     def national_destination_code_length(self) -> int:
         return pn.length_of_national_destination_code(self)
@@ -129,20 +132,27 @@ class PhoneNumber(pn.PhoneNumber):
     def is_voip(self) -> bool:
         return self.number_type == PhoneNumberType.VOIP
 
-    def get_match_type(self, other: Union[str, pn.PhoneNumber], /) -> MatchType:
+    def match(self, other: Union[str, pn.PhoneNumber], /) -> MatchType:
         return MatchType(pn.is_number_match(self, other))
 
     def is_no_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        return self.get_match_type(other) == MatchType.NO_MATCH
+        return self.match(other) == MatchType.NO_MATCH
 
     def is_short_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        return self.get_match_type(other) == MatchType.SHORT_NSN_MATCH
+        return self.match(other) == MatchType.SHORT_NSN_MATCH
 
     def is_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        return self.get_match_type(other) == MatchType.NSN_MATCH
+        return self.match(other) == MatchType.NSN_MATCH
 
     def is_exact_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        return self.get_match_type(other) == MatchType.EXACT_MATCH
+        return self.match(other) == MatchType.EXACT_MATCH
+
+    def is_any_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+        return (
+            self.is_exact_match(other)
+            or self.is_nsn_match(other)
+            or self.is_short_nsn_match(other)
+        )
 
     @lru_cache
     def get_carrier_name(self, lang: str) -> str:
