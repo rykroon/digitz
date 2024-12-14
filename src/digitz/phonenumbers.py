@@ -28,8 +28,8 @@ Self = TypeVar("Self", bound="PhoneNumber")
 
 @dataclass(frozen=True)
 class PhoneNumber(pn.PhoneNumber):
-    country_code: Optional[int]
-    national_number: Optional[int]
+    country_code: int
+    national_number: int
     extension: Optional[str] = None
     italian_leading_zero: bool = False
     number_of_leading_zeros: Optional[int] = None
@@ -67,6 +67,14 @@ class PhoneNumber(pn.PhoneNumber):
 
             else:
                 raise e  # pragma: no cover
+
+        # country_code and national_number should never be None.
+        # These checks are for type checking purposes.
+        if numobj.country_code is None:
+            numobj.country_code = 0
+
+        if numobj.national_number is None:
+            numobj.national_number = 0
 
         return cls(
             country_code=numobj.country_code,
