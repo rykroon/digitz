@@ -11,13 +11,14 @@ from .exceptions import (
     TooShortAfterIDD,
     TooShortNsn,
 )
-from .phonenumbers import PhoneNumber
+from .phonenumbers import PhoneNumber, parse
 
 
 __all__ = [
-    "PhoneNumber",
+    "parse",
     "CountryCodeSource",
     "NumberParseErrorType",
+    "PhoneNumber",
     "PhoneNumberFormat",
     "PhoneNumberType",
     "InvalidCountryCode",

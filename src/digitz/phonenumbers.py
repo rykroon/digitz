@@ -124,7 +124,7 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns the E.164 representation of the phone number."""
         return self.to_e164()
 
-    # national number properties
+    # ~~~ national number related properties ~~~
     @cached_property
     def national_destination_code_length(self) -> int:
         """Returns the length of the national destination code."""
@@ -145,6 +145,7 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns the subscriber number."""
         return self.national_significant_number[self.national_destination_code_length :]
 
+    # ~~~ region related properties ~~~
     @cached_property
     def region_code(self) -> Optional[str]:
         """Returns the region code of the phone number."""
@@ -155,6 +156,7 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns True if the phone number has a geographical association."""
         return pn.is_number_geographical(self)
 
+    # ~~~ phone number validity properties ~~~
     @cached_property
     def is_possible(self) -> bool:
         """Returns True if the phone number is possible."""
@@ -165,7 +167,7 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns True if the phone number is of a valid pattern."""
         return pn.is_valid_number(self)
 
-    # Number type properties
+    # ~~~ Number type properties ~~~
     @cached_property
     def number_type(self) -> PhoneNumberType:
         """Returns the type of a valid phone number."""
@@ -238,16 +240,34 @@ class PhoneNumber(pn.PhoneNumber):
 
         return tuple([pytz.timezone(zone) for zone in time_zones_for_number(self)])
 
+    # ~~~ Match type methods ~~~
     def match(self, other: Union[str, pn.PhoneNumber], /) -> MatchType:
-        """Returns the match type of the phone number."""
+        """Returns the match type of the phone number.
+
+        Parameters:
+            other: The other phone number to compare.
+
+        Returns:
+            The match type of the phone number.
+        """
         return MatchType(pn.is_number_match(self, other))
 
-    def is_no_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        """Returns True if the other phone number is not a match."""
-        # !!! to do: include MatchType.NOT_A_NUMBER ???
-        # thinking about adding a 'strict' parameter to the method
-        # to include NOT_A_NUMBER in the check
-        return self.match(other) == MatchType.NO_MATCH
+    def is_no_match(
+        self, other: Union[str, pn.PhoneNumber], /, *, strict: bool = False
+    ) -> bool:
+        """Returns True if the other phone number is not a match.
+
+        Parameters:
+            other: The other phone number to compare.
+            strict: Whether to strictly check if the other phone number is not a match. If False, it will also return True if the other phone number is not a number.
+
+        Returns:
+            True if the other phone number is not a match.
+        """
+        if strict:
+            return self.match(other) == MatchType.NO_MATCH
+        else:
+            return self.match(other) in (MatchType.NO_MATCH, MatchType.NOT_A_NUMBER)
 
     def is_short_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
         """Returns True if the other phone number is a short NSN match."""
@@ -288,9 +308,16 @@ class PhoneNumber(pn.PhoneNumber):
 
         return description_for_number(self, lang=lang)
 
+    # ~~~ Formatting methods ~~~
     @lru_cache
     def format(self, format: PhoneNumberFormat) -> str:
-        """Returns the string representation of the phone number in the specified format."""
+        """Returns the string representation of the phone number in the specified format.
+        Parameters:
+            format: The format to use.
+
+            Returns:
+                The string representation of the phone number.
+        """
         return pn.format_number(self, format)
 
     def to_e164(self) -> str:
@@ -352,3 +379,17 @@ class PhoneNumber(pn.PhoneNumber):
             italian_leading_zero=italian_leading_zero,
             number_of_leading_zeros=number_of_leading_zeros,
         )
+
+
+def parse(
+    number: str,
+    /,
+    *,
+    region: Optional[str] = None,
+    keep_raw_input: bool = False,
+) -> PhoneNumber:
+    """Convenience function to parse a phone number.
+    
+    See `digitz.PhoneNumber.parse` for details.
+    """
+    return PhoneNumber.parse(number, region=region, keep_raw_input=keep_raw_input)
