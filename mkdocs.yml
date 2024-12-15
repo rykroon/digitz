@@ -45,15 +45,25 @@ nav:
 watch:
   - src/digitz
 
-
 markdown_extensions:
   - admonition
+  # - mkautodoc
 
 plugins:
 - mkdocstrings:
     handlers:
       python:
         options:
-          show_root_heading: true
-          separate_signature: true
+          # general
           show_source: false
+          # headings
+          show_root_heading: true
+          show_category_heading: true
+          # members
+          members_order: 'source'
+          # docstrings
+          merge_init_into_class: true
+          # signatures
+          show_signature_annotations: true
+          separate_signature: true
+
