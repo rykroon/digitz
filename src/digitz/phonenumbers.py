@@ -28,19 +28,6 @@ from digitz.exceptions import (
 Self = TypeVar("Self", bound="PhoneNumber")
 
 
-def number_type_property(phone_number_type: PhoneNumberType) -> property:
-    """Return a property that returns whether the phone number is of the given type."""
-
-    def fget(self: Self) -> bool:
-        return self.number_type == phone_number_type
-
-    verbose_number_type = phone_number_type.name.lower().replace("_", " ")
-    return property(
-        fget=fget,
-        doc=f"Returns whether the phone number type is {verbose_number_type}."
-    )
-
-
 @dataclass(frozen=True)
 class PhoneNumber(pn.PhoneNumber):
     """
@@ -75,7 +62,23 @@ class PhoneNumber(pn.PhoneNumber):
         region: Optional[str] = None,
         keep_raw_input: bool = False,
     ) -> Self:
-        """Parses a phone number."""
+        """Attempts to parse a string and return a new PhoneNumber object.
+        
+        Parameters:
+            number: The phone number to parse.
+            region: The region code the phone number is expected to be from.
+            keep_raw_input: Whether to keep the raw input of the phone number.
+        
+        Raises:
+            InvalidCountryCode: If the country code is invalid.
+            NotANumber: If the phone number is not a number.
+            TooLong: If the phone number is too long.
+            TooShortAfterIDD: If the phone number is too short after IDD.
+            TooShortNsn: If the phone number is too short after the country code.
+        
+        Returns:
+            A new PhoneNumber object.
+        """
         try:
             numobj = pn.parse(number, region=region, keep_raw_input=keep_raw_input)
 
@@ -121,6 +124,7 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns the E.164 representation of the phone number."""
         return self.to_e164()
 
+    # national number properties
     @cached_property
     def national_destination_code_length(self) -> int:
         """Returns the length of the national destination code."""
@@ -142,14 +146,90 @@ class PhoneNumber(pn.PhoneNumber):
         return self.national_significant_number[self.national_destination_code_length :]
 
     @cached_property
-    def number_type(self) -> PhoneNumberType:
-        """Returns the type of the phone number."""
-        return PhoneNumberType(pn.number_type(self))
-
-    @cached_property
     def region_code(self) -> Optional[str]:
         """Returns the region code of the phone number."""
         return pn.region_code_for_number(self)
+
+    @cached_property
+    def is_geographical(self) -> bool:
+        """Returns True if the phone number has a geographical association."""
+        return pn.is_number_geographical(self)
+
+    @cached_property
+    def is_possible(self) -> bool:
+        """Returns True if the phone number is possible."""
+        return pn.is_possible_number(self)
+
+    @cached_property
+    def is_valid(self) -> bool:
+        """Returns True if the phone number is of a valid pattern."""
+        return pn.is_valid_number(self)
+
+    # Number type properties
+    @cached_property
+    def number_type(self) -> PhoneNumberType:
+        """Returns the type of a valid phone number."""
+        return PhoneNumberType(pn.number_type(self))
+
+    @property
+    def is_fixed_line(self) -> bool:
+        """Returns whether the phone number type is fixed line."""
+        return self.number_type == PhoneNumberType.FIXED_LINE
+
+    @property
+    def is_mobile(self) -> bool:
+        """Returns whether the phone number type is mobile."""
+        return self.number_type == PhoneNumberType.MOBILE
+
+    @property
+    def is_fixed_line_or_mobile(self) -> bool:
+        """Returns whether the phone number type is fixed line or mobile."""
+        return self.number_type == PhoneNumberType.FIXED_LINE_OR_MOBILE
+
+    @property
+    def is_toll_free(self) -> bool:
+        """Returns whether the phone number type is toll free."""
+        return self.number_type == PhoneNumberType.TOLL_FREE
+
+    @property
+    def is_premium_rate(self) -> bool:
+        """Returns whether the phone number type is premium rate."""
+        return self.number_type == PhoneNumberType.PREMIUM_RATE
+
+    @property
+    def is_shared_cost(self) -> bool:
+        """Returns whether the phone number type is shared cost."""
+        return self.number_type == PhoneNumberType.SHARED_COST
+    
+    @property
+    def is_voip(self) -> bool:
+        """Returns whether the phone number type is voip."""
+        return self.number_type == PhoneNumberType.VOIP
+    
+    @property
+    def is_personal_number(self) -> bool:
+        """Returns whether the phone number type is personal number."""
+        return self.number_type == PhoneNumberType.PERSONAL_NUMBER
+    
+    @property
+    def is_pager(self) -> bool:
+        """Returns whether the phone number type is pager."""
+        return self.number_type == PhoneNumberType.PAGER
+    
+    @property
+    def is_uan(self) -> bool:
+        """Returns whether the phone number type is uan."""
+        return self.number_type == PhoneNumberType.UAN
+    
+    @property
+    def is_voicemail(self) -> bool:
+        """Returns whether the phone number type is voicemail."""
+        return self.number_type == PhoneNumberType.VOICEMAIL
+
+    @property
+    def is_unknown(self) -> bool:
+        """Returns whether the phone number type is unknown."""
+        return self.number_type == PhoneNumberType.UNKNOWN
 
     @cached_property
     def timezones(self) -> Tuple[BaseTzInfo, ...]:
@@ -158,61 +238,33 @@ class PhoneNumber(pn.PhoneNumber):
 
         return tuple([pytz.timezone(zone) for zone in time_zones_for_number(self)])
 
-    @cached_property
-    def is_geographical(self) -> bool:
-        """Returns whether the phone number is geographical."""
-        return pn.is_number_geographical(self)
-
-    @cached_property
-    def is_possible(self) -> bool:
-        """Returns whether the phone number is possible."""
-        return pn.is_possible_number(self)
-
-    @cached_property
-    def is_valid(self) -> bool:
-        """Returns whether the phone number is valid."""
-        return pn.is_valid_number(self)
-
-    # Number type properties
-    is_fixed_line = number_type_property(PhoneNumberType.FIXED_LINE)
-    is_mobile = number_type_property(PhoneNumberType.MOBILE)
-    is_fixed_line_or_mobile = number_type_property(PhoneNumberType.FIXED_LINE_OR_MOBILE)
-    is_toll_free = number_type_property(PhoneNumberType.TOLL_FREE)
-    is_premium_rate = number_type_property(PhoneNumberType.PREMIUM_RATE)
-    is_shared_cost = number_type_property(PhoneNumberType.SHARED_COST)
-    is_voip = number_type_property(PhoneNumberType.VOIP)
-    is_personal_number = number_type_property(PhoneNumberType.PERSONAL_NUMBER)
-    is_pager = number_type_property(PhoneNumberType.PAGER)
-    is_uan = number_type_property(PhoneNumberType.UAN)
-    is_voicemail = number_type_property(PhoneNumberType.VOICEMAIL)
-    is_unknown = number_type_property(PhoneNumberType.UNKNOWN)
-
     def match(self, other: Union[str, pn.PhoneNumber], /) -> MatchType:
         """Returns the match type of the phone number."""
         return MatchType(pn.is_number_match(self, other))
 
     def is_no_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        """Returns True if the phone number is not a match."""
+        """Returns True if the other phone number is not a match."""
+        # !!! to do: include MatchType.NOT_A_NUMBER ???
+        # thinking about adding a 'strict' parameter to the method
+        # to include NOT_A_NUMBER in the check
         return self.match(other) == MatchType.NO_MATCH
 
     def is_short_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        """Returns True if the phone number is a short NSN match."""
+        """Returns True if the other phone number is a short NSN match."""
         return self.match(other) == MatchType.SHORT_NSN_MATCH
 
     def is_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        """Returns True if the phone number is a NSN match."""
+        """Returns True if the other phone number is a NSN match."""
         return self.match(other) == MatchType.NSN_MATCH
 
     def is_exact_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        """Returns True if the phone number is an exact match."""
+        """Returns True if the other phone number is an exact match."""
         return self.match(other) == MatchType.EXACT_MATCH
 
     def is_any_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
-        """Returns True if the phone number is any match."""
-        return (
-            self.is_exact_match(other)
-            or self.is_nsn_match(other)
-            or self.is_short_nsn_match(other)
+        """Returns True if the other phone number is any match."""
+        return self.match(other) in (
+            MatchType.EXACT_MATCH, MatchType.NSN_MATCH, MatchType.SHORT_NSN_MATCH
         )
 
     @lru_cache
@@ -266,7 +318,18 @@ class PhoneNumber(pn.PhoneNumber):
         italian_leading_zero: Optional[bool] = None,
         number_of_leading_zeros: Optional[int] = None,
     ) -> Self:
-        """Returns a new phone number with the specified attributes replaced."""
+        """Returns a new phone number with the specified attributes replaced.
+        
+        Parameters:
+            country_code: The country code of the phone number.
+            national_number: The national number of the phone number.
+            extension: The extension of the phone number.
+            italian_leading_zero: Whether the phone number has an Italian leading zero.
+            number_of_leading_zeros: The number of leading zeros in the phone number.
+        
+        Returns:
+            A new PhoneNumber object
+        """
         if country_code is None:
             country_code = self.country_code
 
