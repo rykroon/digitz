@@ -1,118 +1,58 @@
 import phonenumbers as pn
+import pytest
 from digitz import PhoneNumber
+
 from .fixtures import (
-    num_can, num_can_pn, num_ita, num_ita_pn, num_mex, num_mex_pn, num_usa, num_usa_pn
+    USA_EXAMPLE_NUMBER,
+    CAN_EXAMPLE_NUMBER,
+    MEX_EXAMPLE_NUMBER,
+    ITA_EXAMPLE_NUMBER,
 )
 
-def test_str(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert str(num_usa) == pn.format_number(num_usa_pn, pn.PhoneNumberFormat.E164)
-    assert str(num_can) == pn.format_number(num_can_pn, pn.PhoneNumberFormat.E164)
-    assert str(num_mex) == pn.format_number(num_mex_pn, pn.PhoneNumberFormat.E164)
-    assert str(num_ita) == pn.format_number(num_ita_pn, pn.PhoneNumberFormat.E164)
+PHONE_NUMBERS = [
+    USA_EXAMPLE_NUMBER,
+    CAN_EXAMPLE_NUMBER,
+    MEX_EXAMPLE_NUMBER,
+    ITA_EXAMPLE_NUMBER,
+]
 
 
-class TestFormat:
-    def test_to_international(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa.to_international() == pn.format_number(
-            num_usa_pn, pn.PhoneNumberFormat.INTERNATIONAL
-        )
-        assert num_can.to_international() == pn.format_number(
-            num_can_pn, pn.PhoneNumberFormat.INTERNATIONAL
-        )
-        assert num_mex.to_international() == pn.format_number(
-            num_mex_pn, pn.PhoneNumberFormat.INTERNATIONAL
-        )
-        assert num_ita.to_international() == pn.format_number(
-            num_ita_pn, pn.PhoneNumberFormat.INTERNATIONAL
-        )
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_str(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    assert str(num_dg) == pn.format_number(num_pn, pn.PhoneNumberFormat.E164)
 
-    def test_to_national(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa.to_national() == pn.format_number(
-            num_usa_pn, pn.PhoneNumberFormat.NATIONAL
-        )
-        assert num_can.to_national() == pn.format_number(
-            num_can_pn, pn.PhoneNumberFormat.NATIONAL
-        )
-        assert num_mex.to_national() == pn.format_number(
-            num_mex_pn, pn.PhoneNumberFormat.NATIONAL
-        )
-        assert num_ita.to_national() == pn.format_number(
-            num_ita_pn, pn.PhoneNumberFormat.NATIONAL
-        )
 
-    def test_e164_format(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa.to_e164() == pn.format_number(
-            num_usa_pn, pn.PhoneNumberFormat.E164
-        )
-        assert num_can.to_e164() == pn.format_number(
-            num_can_pn, pn.PhoneNumberFormat.E164
-        )
-        assert num_mex.to_e164() == pn.format_number(
-            num_mex_pn, pn.PhoneNumberFormat.E164
-        )
-        assert num_ita.to_e164() == pn.format_number(
-            num_ita_pn, pn.PhoneNumberFormat.E164
-        )
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_to_international(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    assert num_dg.to_international() == pn.format_number(
+        num_pn, pn.PhoneNumberFormat.INTERNATIONAL
+    )
 
-    def test_to_rfc3966(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa.to_rfc3966() == pn.format_number(
-            num_usa_pn, pn.PhoneNumberFormat.RFC3966
-        )
-        assert num_can.to_rfc3966() == pn.format_number(
-            num_can_pn, pn.PhoneNumberFormat.RFC3966
-        )
-        assert num_mex.to_rfc3966() == pn.format_number(
-            num_mex_pn, pn.PhoneNumberFormat.RFC3966
-        )
-        assert num_ita.to_rfc3966() == pn.format_number(
-            num_ita_pn, pn.PhoneNumberFormat.RFC3966
-        )
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_to_national(phonenumber) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    assert num_dg.to_national() == pn.format_number(
+        num_pn, pn.PhoneNumberFormat.NATIONAL
+    )
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_e164_format(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    assert num_dg.to_e164() == pn.format_number(
+        num_pn, pn.PhoneNumberFormat.E164
+    )
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_to_rfc3966(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    assert num_dg.to_rfc3966() == pn.format_number(
+        num_pn, pn.PhoneNumberFormat.RFC3966
+    )

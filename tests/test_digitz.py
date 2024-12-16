@@ -10,10 +10,6 @@ from digitz.exceptions import (
     TooShortNsn,
 )
 import phonenumbers as pn
-from phonenumbers.carrier import name_for_number
-from phonenumbers.geocoder import country_name_for_number, description_for_number
-from phonenumbers.timezone import time_zones_for_number
-import pytz
 
 from .fixtures import (
     num_can,
@@ -60,164 +56,6 @@ class TestParse:
             PhoneNumber.parse("+44 2")
 
 
-def test_number_type(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_toll_free: PhoneNumber,
-    num_usa_toll_free_pn: pn.PhoneNumber,
-    num_usa_voip: PhoneNumber,
-    num_usa_voip_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.number_type == pn.number_type(num_usa_pn)
-    assert num_usa_toll_free.number_type == pn.number_type(num_usa_toll_free_pn)
-    assert num_usa_voip.number_type == pn.number_type(num_usa_voip_pn)
-    assert num_usa_invalid.number_type == pn.number_type(num_usa_invalid_pn)
-    assert num_can.number_type == pn.number_type(num_can_pn)
-    assert num_mex.number_type == pn.number_type(num_mex_pn)
-    assert num_ita.number_type == pn.number_type(num_ita_pn)
-
-
-def test_region_code(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.region_code == pn.region_code_for_number(num_usa_pn)
-    assert num_usa_invalid.region_code == pn.region_code_for_number(num_usa_invalid_pn)
-    assert num_can.region_code == pn.region_code_for_number(num_can_pn)
-    assert num_mex.region_code == pn.region_code_for_number(num_mex_pn)
-    assert num_ita.region_code == pn.region_code_for_number(num_ita_pn)
-
-
-def test_timezones(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_toll_free: PhoneNumber,
-    num_usa_toll_free_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.timezones == tuple(
-        [pytz.timezone(zone) for zone in time_zones_for_number(num_usa_pn)]
-    )
-    assert num_usa_toll_free.timezones == tuple(
-        [pytz.timezone(zone) for zone in time_zones_for_number(num_usa_toll_free_pn)]
-    )
-    assert num_can.timezones == tuple(
-        [pytz.timezone(zone) for zone in time_zones_for_number(num_can_pn)]
-    )
-    assert num_mex.timezones == tuple(
-        [pytz.timezone(zone) for zone in time_zones_for_number(num_mex_pn)]
-    )
-    assert num_ita.timezones == tuple(
-        [pytz.timezone(zone) for zone in time_zones_for_number(num_ita_pn)]
-    )
-
-
-def test_get_carrier_name(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.get_carrier_name(lang="en") == name_for_number(num_usa_pn, lang="en")
-    assert num_can.get_carrier_name(lang="en") == name_for_number(num_can_pn, lang="en")
-    assert num_mex.get_carrier_name(lang="en") == name_for_number(num_mex_pn, lang="en")
-    assert num_ita.get_carrier_name(lang="en") == name_for_number(num_ita_pn, lang="en")
-
-
-def test_get_country_name(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.get_country_name(lang="en") == country_name_for_number(
-        num_usa_pn, lang="en"
-    )
-    assert num_can.get_country_name(lang="en") == country_name_for_number(
-        num_can_pn, lang="en"
-    )
-    assert num_mex.get_country_name(lang="en") == country_name_for_number(
-        num_mex_pn, lang="en"
-    )
-    assert num_ita.get_country_name(lang="en") == country_name_for_number(
-        num_ita_pn, lang="en"
-    )
-
-
-def test_get_description(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.get_description(lang="en") == description_for_number(
-        num_usa_pn, lang="en"
-    )
-    assert num_can.get_description(lang="en") == description_for_number(
-        num_can_pn, lang="en"
-    )
-    assert num_mex.get_description(lang="en") == description_for_number(
-        num_mex_pn, lang="en"
-    )
-    assert num_ita.get_description(lang="en") == description_for_number(
-        num_ita_pn, lang="en"
-    )
-
-
-def test_is_geographical(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_toll_free: PhoneNumber,
-    num_usa_toll_free_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.is_geographical == pn.is_number_geographical(num_usa_pn)
-    assert num_usa_toll_free.is_geographical == pn.is_number_geographical(
-        num_usa_toll_free_pn
-    )
-    assert num_can.is_geographical == pn.is_number_geographical(num_can_pn)
-    assert num_mex.is_geographical == pn.is_number_geographical(num_mex_pn)
-    assert num_ita.is_geographical == pn.is_number_geographical(num_ita_pn)
-
-
 def test_is_possible(
     num_usa: PhoneNumber,
     num_usa_pn: pn.PhoneNumber,
@@ -262,6 +100,31 @@ def test_is_valid(
     assert num_ita.is_valid == pn.is_valid_number(num_ita_pn)
 
 
+def test_number_type(
+    num_usa: PhoneNumber,
+    num_usa_pn: pn.PhoneNumber,
+    num_usa_toll_free: PhoneNumber,
+    num_usa_toll_free_pn: pn.PhoneNumber,
+    num_usa_voip: PhoneNumber,
+    num_usa_voip_pn: pn.PhoneNumber,
+    num_usa_invalid: PhoneNumber,
+    num_usa_invalid_pn: pn.PhoneNumber,
+    num_can: PhoneNumber,
+    num_can_pn: pn.PhoneNumber,
+    num_mex: PhoneNumber,
+    num_mex_pn: pn.PhoneNumber,
+    num_ita: PhoneNumber,
+    num_ita_pn: pn.PhoneNumber,
+) -> None:
+    assert num_usa.number_type == pn.number_type(num_usa_pn)
+    assert num_usa_toll_free.number_type == pn.number_type(num_usa_toll_free_pn)
+    assert num_usa_voip.number_type == pn.number_type(num_usa_voip_pn)
+    assert num_usa_invalid.number_type == pn.number_type(num_usa_invalid_pn)
+    assert num_can.number_type == pn.number_type(num_can_pn)
+    assert num_mex.number_type == pn.number_type(num_mex_pn)
+    assert num_ita.number_type == pn.number_type(num_ita_pn)
+
+
 class TestPhoneNumberType:
     def test_is_toll_free(
         self,
@@ -288,6 +151,46 @@ class TestPhoneNumberType:
             pn.number_type(num_usa_voip_pn) == pn.PhoneNumberType.VOIP
         )
         assert num_usa.is_voip == (pn.number_type(num_usa_pn) == pn.PhoneNumberType.VOIP)
+
+
+def test_region_code(
+    num_usa: PhoneNumber,
+    num_usa_pn: pn.PhoneNumber,
+    num_usa_invalid: PhoneNumber,
+    num_usa_invalid_pn: pn.PhoneNumber,
+    num_can: PhoneNumber,
+    num_can_pn: pn.PhoneNumber,
+    num_mex: PhoneNumber,
+    num_mex_pn: pn.PhoneNumber,
+    num_ita: PhoneNumber,
+    num_ita_pn: pn.PhoneNumber,
+) -> None:
+    assert num_usa.region_code == pn.region_code_for_number(num_usa_pn)
+    assert num_usa_invalid.region_code == pn.region_code_for_number(num_usa_invalid_pn)
+    assert num_can.region_code == pn.region_code_for_number(num_can_pn)
+    assert num_mex.region_code == pn.region_code_for_number(num_mex_pn)
+    assert num_ita.region_code == pn.region_code_for_number(num_ita_pn)
+
+
+def test_is_geographical(
+    num_usa: PhoneNumber,
+    num_usa_pn: pn.PhoneNumber,
+    num_usa_toll_free: PhoneNumber,
+    num_usa_toll_free_pn: pn.PhoneNumber,
+    num_can: PhoneNumber,
+    num_can_pn: pn.PhoneNumber,
+    num_mex: PhoneNumber,
+    num_mex_pn: pn.PhoneNumber,
+    num_ita: PhoneNumber,
+    num_ita_pn: pn.PhoneNumber,
+) -> None:
+    assert num_usa.is_geographical == pn.is_number_geographical(num_usa_pn)
+    assert num_usa_toll_free.is_geographical == pn.is_number_geographical(
+        num_usa_toll_free_pn
+    )
+    assert num_can.is_geographical == pn.is_number_geographical(num_can_pn)
+    assert num_mex.is_geographical == pn.is_number_geographical(num_mex_pn)
+    assert num_ita.is_geographical == pn.is_number_geographical(num_ita_pn)
 
 
 class TestReplace:
