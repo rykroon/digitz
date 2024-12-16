@@ -1,7 +1,7 @@
 from dataclasses import FrozenInstanceError
 import pytest
 
-from digitz import PhoneNumber
+from digitz import PhoneNumber, parse
 from digitz.exceptions import (
     InvalidCountryCode,
     NotANumber,
@@ -15,85 +15,24 @@ from phonenumbers.geocoder import country_name_for_number, description_for_numbe
 from phonenumbers.timezone import time_zones_for_number
 import pytz
 
+from .fixtures import (
+    num_can,
+    num_can_pn,
+    num_ita,
+    num_ita_pn,
+    num_mex,
+    num_mex_pn,
+    num_usa,
+    num_usa_pn,
+    num_usa_invalid,
+    num_usa_invalid_pn,
+    num_usa_toll_free,
+    num_usa_toll_free_pn,
+    num_usa_voip,
+    num_usa_voip_pn,
+)
 
 USA_EXAMPLE_NUMBER = "+1 (201) 555-0123"
-CAN_EXAMPLE_NUMBER = "+1 506-234-5678"
-MEX_EXAMPLE_NUMBER = "+52 200 123 4567"
-ITA_EXAMPLE_NUMBER = "+39 02 1234 5678"
-
-USA_TOLL_FREE_EXAMPLE_NUMBER = "+1 800-234-5678"
-USA_VOIP_EXAMPLE_NUMBER = "+1 305-209-0123"
-USA_INVALID_EXAMPLE_NUMBER = "+1 201555012"
-
-
-@pytest.fixture
-def num_usa() -> PhoneNumber:
-    return PhoneNumber.parse(USA_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_usa_pn() -> pn.PhoneNumber:
-    return pn.parse(USA_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_usa_toll_free() -> PhoneNumber:
-    return PhoneNumber.parse(USA_TOLL_FREE_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_usa_toll_free_pn() -> pn.PhoneNumber:
-    return pn.parse(USA_TOLL_FREE_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_usa_voip() -> PhoneNumber:
-    return PhoneNumber.parse(USA_VOIP_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_usa_voip_pn() -> pn.PhoneNumber:
-    return pn.parse(USA_VOIP_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_usa_invalid() -> PhoneNumber:
-    return PhoneNumber.parse(USA_INVALID_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_usa_invalid_pn() -> pn.PhoneNumber:
-    return pn.parse(USA_INVALID_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_can() -> PhoneNumber:
-    return PhoneNumber.parse(CAN_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_can_pn() -> pn.PhoneNumber:
-    return pn.parse(CAN_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_mex() -> PhoneNumber:
-    return PhoneNumber.parse(MEX_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_mex_pn() -> pn.PhoneNumber:
-    return pn.parse(MEX_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_ita() -> PhoneNumber:
-    return PhoneNumber.parse(ITA_EXAMPLE_NUMBER)
-
-
-@pytest.fixture
-def num_ita_pn() -> pn.PhoneNumber:
-    return pn.parse(ITA_EXAMPLE_NUMBER)
 
 
 class TestParse:
@@ -102,191 +41,23 @@ class TestParse:
 
     def test_invalid_country_code(self) -> None:
         with pytest.raises(InvalidCountryCode):
-            PhoneNumber.parse("+999 (201) 555-0123")
+            parse("+999 (201) 555-0123")
 
     def test_not_a_number(self) -> None:
         with pytest.raises(NotANumber):
-            PhoneNumber.parse("foo")
+            parse("foo")
 
     def test_too_long(self) -> None:
         with pytest.raises(TooLong):
-            PhoneNumber.parse("+1 (201) 555-0123012301230123")
+            parse("+1 (201) 555-0123012301230123")
 
     def test_too_short_after_idd(self) -> None:
         with pytest.raises(TooShortAfterIDD):
-            PhoneNumber.parse("011", region="US")
+            parse("011", region="US")
 
     def test_too_short_nsn(self) -> None:
         with pytest.raises(TooShortNsn):
             PhoneNumber.parse("+44 2")
-
-
-def test_str(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert str(num_usa) == pn.format_number(num_usa_pn, pn.PhoneNumberFormat.E164)
-    assert str(num_can) == pn.format_number(num_can_pn, pn.PhoneNumberFormat.E164)
-    assert str(num_mex) == pn.format_number(num_mex_pn, pn.PhoneNumberFormat.E164)
-    assert str(num_ita) == pn.format_number(num_ita_pn, pn.PhoneNumberFormat.E164)
-
-
-def test_national_significant_number(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.national_significant_number == pn.national_significant_number(
-        num_usa_pn
-    )
-    assert num_can.national_significant_number == pn.national_significant_number(
-        num_can_pn
-    )
-    assert num_mex.national_significant_number == pn.national_significant_number(
-        num_mex_pn
-    )
-    assert num_ita.national_significant_number == pn.national_significant_number(
-        num_ita_pn
-    )
-
-
-def test_national_destination_code_length(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_usa_toll_free: PhoneNumber,
-    num_usa_toll_free_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert (
-        num_usa.national_destination_code_length
-        == pn.length_of_national_destination_code(num_usa_pn)
-    )
-    assert (
-        num_usa_invalid.national_destination_code_length
-        == pn.length_of_national_destination_code(num_usa_invalid_pn)
-    )
-    assert (
-        num_usa_toll_free.national_destination_code_length
-        == pn.length_of_national_destination_code(num_usa_toll_free_pn)
-    )
-    assert (
-        num_can.national_destination_code_length
-        == pn.length_of_national_destination_code(num_can_pn)
-    )
-    assert (
-        num_mex.national_destination_code_length
-        == pn.length_of_national_destination_code(num_mex_pn)
-    )
-    assert (
-        num_ita.national_destination_code_length
-        == pn.length_of_national_destination_code(num_ita_pn)
-    )
-
-
-def test_national_destination_code(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert (
-        num_usa.national_destination_code
-        == pn.national_significant_number(num_usa_pn)[
-            : pn.length_of_national_destination_code(num_usa_pn)
-        ]
-    )
-    assert (
-        num_usa_invalid.national_destination_code
-        == pn.national_significant_number(num_usa_invalid_pn)[
-            : pn.length_of_national_destination_code(num_usa_invalid_pn)
-        ]
-    )
-    assert (
-        num_can.national_destination_code
-        == pn.national_significant_number(num_can_pn)[
-            : pn.length_of_national_destination_code(num_can_pn)
-        ]
-    )
-    assert (
-        num_mex.national_destination_code
-        == pn.national_significant_number(num_mex_pn)[
-            : pn.length_of_national_destination_code(num_mex_pn)
-        ]
-    )
-    assert (
-        num_ita.national_destination_code
-        == pn.national_significant_number(num_ita_pn)[
-            : pn.length_of_national_destination_code(num_ita_pn)
-        ]
-    )
-
-
-def test_subscriber_number(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert (
-        num_usa.subscriber_number
-        == pn.national_significant_number(num_usa_pn)[
-            pn.length_of_national_destination_code(num_usa_pn) :
-        ]
-    )
-    assert (
-        num_usa_invalid.subscriber_number
-        == pn.national_significant_number(num_usa_invalid_pn)[
-            pn.length_of_national_destination_code(num_usa_invalid_pn) :
-        ]
-    )
-    assert (
-        num_can.subscriber_number
-        == pn.national_significant_number(num_can_pn)[
-            pn.length_of_national_destination_code(num_can_pn) :
-        ]
-    )
-    assert (
-        num_mex.subscriber_number
-        == pn.national_significant_number(num_mex_pn)[
-            pn.length_of_national_destination_code(num_mex_pn) :
-        ]
-    )
-    assert (
-        num_ita.subscriber_number
-        == pn.national_significant_number(num_ita_pn)[
-            pn.length_of_national_destination_code(num_ita_pn) :
-        ]
-    )
 
 
 def test_number_type(
@@ -517,299 +288,6 @@ class TestPhoneNumberType:
             pn.number_type(num_usa_voip_pn) == pn.PhoneNumberType.VOIP
         )
         assert num_usa.is_voip == (pn.number_type(num_usa_pn) == pn.PhoneNumberType.VOIP)
-
-
-class TestMatch:
-
-    def test_is_no_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        # not a match is True
-        assert num_usa.is_no_match(num_can_pn) == (
-            pn.is_number_match(num_usa, num_can_pn) == pn.MatchType.NO_MATCH
-        ) == True
-        assert num_can.is_no_match(num_mex_pn) == (
-            pn.is_number_match(num_can, num_mex_pn) == pn.MatchType.NO_MATCH
-        ) == True
-        assert num_mex.is_no_match(num_ita_pn) == (
-            pn.is_number_match(num_mex, num_ita_pn) == pn.MatchType.NO_MATCH
-        ) == True
-        assert num_ita.is_no_match(num_usa_pn) == (
-            pn.is_number_match(num_ita, num_usa_pn) == pn.MatchType.NO_MATCH
-        ) == True
-
-        # not a match is False
-        assert num_usa.is_no_match(num_usa_pn) == (
-            pn.is_number_match(num_usa, num_usa_pn) == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_can.is_no_match(num_can_pn) == (
-            pn.is_number_match(num_can, num_can_pn) == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_mex.is_no_match(num_mex_pn) == (
-            pn.is_number_match(num_mex, num_mex_pn) == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_ita.is_no_match(num_ita_pn) == (
-            pn.is_number_match(num_ita, num_ita_pn) == pn.MatchType.NO_MATCH
-        ) == False
-
-    def test_is_short_nsn_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        num_usa_ext = num_usa.replace(extension="1234")
-        num_can_ext = num_can.replace(extension="1234")
-        num_mex_ext = num_mex.replace(extension="1234")
-        num_ita_ext = num_ita.replace(extension="1234")
-
-        # is short nsn match due to extension
-        assert num_usa_ext.is_short_nsn_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_ext, num_usa_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_can_ext.is_short_nsn_match(num_can_pn) == (
-            pn.is_number_match(num_can_ext, num_can_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_mex_ext.is_short_nsn_match(num_mex_pn) == (
-            pn.is_number_match(num_mex_ext, num_mex_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_ita_ext.is_short_nsn_match(num_ita_pn) == (
-            pn.is_number_match(num_ita_ext, num_ita_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-
-        # is short nsn match due to leading zeros
-        num_usa_lead = num_usa.replace(number_of_leading_zeros=1, italian_leading_zero=True)
-        num_can_lead = num_can.replace(number_of_leading_zeros=1, italian_leading_zero=True)
-        num_mex_lead = num_mex.replace(number_of_leading_zeros=1, italian_leading_zero=True)
-        num_ita_lead = num_ita.replace(number_of_leading_zeros=2)
-
-        assert num_usa_lead.is_short_nsn_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_lead, num_usa_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_can_lead.is_short_nsn_match(num_can_pn) == (
-            pn.is_number_match(num_can_lead, num_can_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_mex_lead.is_short_nsn_match(num_mex_pn) == (
-            pn.is_number_match(num_mex_lead, num_mex_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_ita_lead.is_short_nsn_match(num_ita_pn) == (
-            pn.is_number_match(num_ita_lead, num_ita_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-
-    def test_is_nsn_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        num_usa_no_region = num_usa.replace(country_code=0)
-        num_can_no_region = num_can.replace(country_code=0)
-        num_mex_no_region = num_mex.replace(country_code=0)
-        num_ita_no_region = num_ita.replace(country_code=0)
-
-        # is nsn match is True
-        assert num_usa_no_region.is_nsn_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_no_region, num_usa_pn) == pn.MatchType.NSN_MATCH
-        ) == True
-        assert num_can_no_region.is_nsn_match(num_can_pn) == (
-            pn.is_number_match(num_can_no_region, num_can_pn) == pn.MatchType.NSN_MATCH
-        ) == True
-        assert num_mex_no_region.is_nsn_match(num_mex_pn) == (
-            pn.is_number_match(num_mex_no_region, num_mex_pn) == pn.MatchType.NSN_MATCH
-        ) == True
-        assert num_ita_no_region.is_nsn_match(num_ita_pn) == (
-            pn.is_number_match(num_ita_no_region, num_ita_pn) == pn.MatchType.NSN_MATCH
-        ) == True
-
-    def test_is_exact_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        # is exact match is True
-        assert num_usa.is_exact_match(num_usa_pn) == (
-            pn.is_number_match(num_usa, num_usa_pn) == pn.MatchType.EXACT_MATCH
-        ) == True
-        assert num_can.is_exact_match(num_can_pn) == (
-            pn.is_number_match(num_can, num_can_pn) == pn.MatchType.EXACT_MATCH
-        ) == True
-        assert num_mex.is_exact_match(num_mex_pn) == (
-            pn.is_number_match(num_mex, num_mex_pn) == pn.MatchType.EXACT_MATCH
-        ) == True
-        assert num_ita.is_exact_match(num_ita_pn) == (
-            pn.is_number_match(num_ita, num_ita_pn) == pn.MatchType.EXACT_MATCH
-        ) == True
-
-        # is exact match is False
-        assert num_usa.is_exact_match(num_can_pn) == (
-            pn.is_number_match(num_usa, num_can_pn) == pn.MatchType.EXACT_MATCH
-        ) == False
-        assert num_can.is_exact_match(num_mex_pn) == (
-            pn.is_number_match(num_can, num_mex_pn) == pn.MatchType.EXACT_MATCH
-        ) == False
-        assert num_mex.is_exact_match(num_ita_pn) == (
-            pn.is_number_match(num_mex, num_ita_pn) == pn.MatchType.EXACT_MATCH
-        ) == False
-        assert num_ita.is_exact_match(num_usa_pn) == (
-            pn.is_number_match(num_ita, num_usa_pn) == pn.MatchType.EXACT_MATCH
-        ) == False
-    
-    def test_is_any_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-    ):
-        num_usa_no_region = num_usa.replace(country_code=0)
-        num_usa_ext = num_usa.replace(extension="1234")
-        num_usa_lead = num_usa.replace(number_of_leading_zeros=1, italian_leading_zero=True)
-
-        ANY_MATCH = pn.MatchType.EXACT_MATCH, pn.MatchType.NSN_MATCH, pn.MatchType.SHORT_NSN_MATCH
-
-        # is any match is True
-        assert num_usa_no_region.is_any_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_no_region, num_usa_pn) in ANY_MATCH
-        ) == True
-        assert num_usa_ext.is_any_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_ext, num_usa_pn) in ANY_MATCH
-        ) == True
-        assert num_usa_lead.is_any_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_lead, num_usa_pn) in ANY_MATCH
-        ) == True
-
-        # is any match is False
-        assert num_usa_no_region.is_any_match(num_can_pn) == (
-            pn.is_number_match(num_usa_no_region, num_can_pn) in ANY_MATCH
-        ) == False
-        assert num_usa_ext.is_any_match(num_can_pn) == (
-            pn.is_number_match(num_usa_ext, num_can_pn) in ANY_MATCH
-        ) == False
-        assert num_usa_lead.is_any_match(num_can_pn) == (
-            pn.is_number_match(num_usa_lead, num_can_pn) in ANY_MATCH
-        ) == False
-
-
-
-class TestFormat:
-    def test_to_international(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa.to_international() == pn.format_number(
-            num_usa_pn, pn.PhoneNumberFormat.INTERNATIONAL
-        )
-        assert num_can.to_international() == pn.format_number(
-            num_can_pn, pn.PhoneNumberFormat.INTERNATIONAL
-        )
-        assert num_mex.to_international() == pn.format_number(
-            num_mex_pn, pn.PhoneNumberFormat.INTERNATIONAL
-        )
-        assert num_ita.to_international() == pn.format_number(
-            num_ita_pn, pn.PhoneNumberFormat.INTERNATIONAL
-        )
-
-    def test_to_national(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa.to_national() == pn.format_number(
-            num_usa_pn, pn.PhoneNumberFormat.NATIONAL
-        )
-        assert num_can.to_national() == pn.format_number(
-            num_can_pn, pn.PhoneNumberFormat.NATIONAL
-        )
-        assert num_mex.to_national() == pn.format_number(
-            num_mex_pn, pn.PhoneNumberFormat.NATIONAL
-        )
-        assert num_ita.to_national() == pn.format_number(
-            num_ita_pn, pn.PhoneNumberFormat.NATIONAL
-        )
-
-    def test_e164_format(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa.to_e164() == pn.format_number(
-            num_usa_pn, pn.PhoneNumberFormat.E164
-        )
-        assert num_can.to_e164() == pn.format_number(
-            num_can_pn, pn.PhoneNumberFormat.E164
-        )
-        assert num_mex.to_e164() == pn.format_number(
-            num_mex_pn, pn.PhoneNumberFormat.E164
-        )
-        assert num_ita.to_e164() == pn.format_number(
-            num_ita_pn, pn.PhoneNumberFormat.E164
-        )
-
-    def test_to_rfc3966(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa.to_rfc3966() == pn.format_number(
-            num_usa_pn, pn.PhoneNumberFormat.RFC3966
-        )
-        assert num_can.to_rfc3966() == pn.format_number(
-            num_can_pn, pn.PhoneNumberFormat.RFC3966
-        )
-        assert num_mex.to_rfc3966() == pn.format_number(
-            num_mex_pn, pn.PhoneNumberFormat.RFC3966
-        )
-        assert num_ita.to_rfc3966() == pn.format_number(
-            num_ita_pn, pn.PhoneNumberFormat.RFC3966
-        )
 
 
 class TestReplace:
