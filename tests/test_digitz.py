@@ -11,7 +11,7 @@ from digitz.exceptions import (
 )
 import phonenumbers as pn
 
-from .fixtures import (
+from .parametrize import (
     num_can,
     num_can_pn,
     num_ita,

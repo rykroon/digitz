@@ -1,225 +1,149 @@
 import phonenumbers as pn
+import pytest
 from digitz import PhoneNumber
-from .fixtures import (
-    num_can, num_can_pn, num_ita, num_ita_pn, num_mex, num_mex_pn, num_usa, num_usa_pn
-)
+from .parametrize import create_number_list
+
+PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
 
 
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_no_match_false(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
 
-class TestMatch:
+    # test with string
+    assert num_dg.is_no_match(phonenumber) == (
+        pn.is_number_match(num_dg, phonenumber) == pn.MatchType.NO_MATCH
+    ) == False
 
-    def test_is_no_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        # not a match is True
-        assert num_usa.is_no_match(num_can_pn) == (
-            pn.is_number_match(num_usa, num_can_pn) == pn.MatchType.NO_MATCH
-        ) == True
-        assert num_can.is_no_match(num_mex_pn) == (
-            pn.is_number_match(num_can, num_mex_pn) == pn.MatchType.NO_MATCH
-        ) == True
-        assert num_mex.is_no_match(num_ita_pn) == (
-            pn.is_number_match(num_mex, num_ita_pn) == pn.MatchType.NO_MATCH
-        ) == True
-        assert num_ita.is_no_match(num_usa_pn) == (
-            pn.is_number_match(num_ita, num_usa_pn) == pn.MatchType.NO_MATCH
-        ) == True
+    # test with object
+    assert num_dg.is_no_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) == pn.MatchType.NO_MATCH
+    ) == False
 
-        # not a match is False
-        assert num_usa.is_no_match(num_usa_pn) == (
-            pn.is_number_match(num_usa, num_usa_pn) == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_can.is_no_match(num_can_pn) == (
-            pn.is_number_match(num_can, num_can_pn) == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_mex.is_no_match(num_mex_pn) == (
-            pn.is_number_match(num_mex, num_mex_pn) == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_ita.is_no_match(num_ita_pn) == (
-            pn.is_number_match(num_ita, num_ita_pn) == pn.MatchType.NO_MATCH
-        ) == False
 
-    def test_is_no_match_strict(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        # not a match (strict) is False
-        assert num_usa.is_no_match("not_a_number", strict=True) == (
-            pn.is_number_match(num_usa, "not_a_number") == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_can.is_no_match("not_a_number", strict=True) == (
-            pn.is_number_match(num_can, "not_a_number") == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_mex.is_no_match("not_a_number", strict=True) == (
-            pn.is_number_match(num_mex, "not_a_number") == pn.MatchType.NO_MATCH
-        ) == False
-        assert num_ita.is_no_match("not_a_number", strict=True) == (
-            pn.is_number_match(num_ita, "not_a_number") == pn.MatchType.NO_MATCH
-        ) == False
+@pytest.mark.parametrize("num1,num2", list(zip(PHONE_NUMBERS, PHONE_NUMBERS[1:] + PHONE_NUMBERS[:1])))
+def test_is_no_match_true(num1: str, num2: str) -> None:
+    num_dg = PhoneNumber.parse(num1)
+    num_pn = pn.parse(num2)
 
-    def test_is_short_nsn_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        num_usa_ext = num_usa.replace(extension="1234")
-        num_can_ext = num_can.replace(extension="1234")
-        num_mex_ext = num_mex.replace(extension="1234")
-        num_ita_ext = num_ita.replace(extension="1234")
+    assert num_dg.is_no_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) == pn.MatchType.NO_MATCH
+    ) == True
 
-        # is short nsn match due to extension
-        assert num_usa_ext.is_short_nsn_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_ext, num_usa_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_can_ext.is_short_nsn_match(num_can_pn) == (
-            pn.is_number_match(num_can_ext, num_can_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_mex_ext.is_short_nsn_match(num_mex_pn) == (
-            pn.is_number_match(num_mex_ext, num_mex_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_ita_ext.is_short_nsn_match(num_ita_pn) == (
-            pn.is_number_match(num_ita_ext, num_ita_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
 
-        # is short nsn match due to leading zeros
-        num_usa_lead = num_usa.replace(number_of_leading_zeros=1, italian_leading_zero=True)
-        num_can_lead = num_can.replace(number_of_leading_zeros=1, italian_leading_zero=True)
-        num_mex_lead = num_mex.replace(number_of_leading_zeros=1, italian_leading_zero=True)
-        num_ita_lead = num_ita.replace(number_of_leading_zeros=2)
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_no_match_strict_nan(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
 
-        assert num_usa_lead.is_short_nsn_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_lead, num_usa_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_can_lead.is_short_nsn_match(num_can_pn) == (
-            pn.is_number_match(num_can_lead, num_can_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_mex_lead.is_short_nsn_match(num_mex_pn) == (
-            pn.is_number_match(num_mex_lead, num_mex_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
-        assert num_ita_lead.is_short_nsn_match(num_ita_pn) == (
-            pn.is_number_match(num_ita_lead, num_ita_pn) == pn.MatchType.SHORT_NSN_MATCH
-        ) == True
+    # is no match is True
+    assert num_dg.is_no_match("Not a Number", strict=True) == (
+        pn.is_number_match(num_dg, "Not a Number") == pn.MatchType.NO_MATCH
+    ) == False
 
-    def test_is_nsn_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        num_usa_no_region = num_usa.replace(country_code=0)
-        num_can_no_region = num_can.replace(country_code=0)
-        num_mex_no_region = num_mex.replace(country_code=0)
-        num_ita_no_region = num_ita.replace(country_code=0)
 
-        # is nsn match is True
-        assert num_usa_no_region.is_nsn_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_no_region, num_usa_pn) == pn.MatchType.NSN_MATCH
-        ) == True
-        assert num_can_no_region.is_nsn_match(num_can_pn) == (
-            pn.is_number_match(num_can_no_region, num_can_pn) == pn.MatchType.NSN_MATCH
-        ) == True
-        assert num_mex_no_region.is_nsn_match(num_mex_pn) == (
-            pn.is_number_match(num_mex_no_region, num_mex_pn) == pn.MatchType.NSN_MATCH
-        ) == True
-        assert num_ita_no_region.is_nsn_match(num_ita_pn) == (
-            pn.is_number_match(num_ita_no_region, num_ita_pn) == pn.MatchType.NSN_MATCH
-        ) == True
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_short_nsn_match_extension(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    num_pn.extension = "1234"
 
-    def test_is_exact_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can: PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-        num_mex: PhoneNumber,
-        num_mex_pn: pn.PhoneNumber,
-        num_ita: PhoneNumber,
-        num_ita_pn: pn.PhoneNumber,
-    ):
-        # is exact match is True
-        assert num_usa.is_exact_match(num_usa_pn) == (
-            pn.is_number_match(num_usa, num_usa_pn) == pn.MatchType.EXACT_MATCH
-        ) == True
-        assert num_can.is_exact_match(num_can_pn) == (
-            pn.is_number_match(num_can, num_can_pn) == pn.MatchType.EXACT_MATCH
-        ) == True
-        assert num_mex.is_exact_match(num_mex_pn) == (
-            pn.is_number_match(num_mex, num_mex_pn) == pn.MatchType.EXACT_MATCH
-        ) == True
-        assert num_ita.is_exact_match(num_ita_pn) == (
-            pn.is_number_match(num_ita, num_ita_pn) == pn.MatchType.EXACT_MATCH
-        ) == True
+    # is short nsn match is True
+    assert num_dg.is_short_nsn_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) == pn.MatchType.SHORT_NSN_MATCH
+    ) == True
 
-        # is exact match is False
-        assert num_usa.is_exact_match(num_can_pn) == (
-            pn.is_number_match(num_usa, num_can_pn) == pn.MatchType.EXACT_MATCH
-        ) == False
-        assert num_can.is_exact_match(num_mex_pn) == (
-            pn.is_number_match(num_can, num_mex_pn) == pn.MatchType.EXACT_MATCH
-        ) == False
-        assert num_mex.is_exact_match(num_ita_pn) == (
-            pn.is_number_match(num_mex, num_ita_pn) == pn.MatchType.EXACT_MATCH
-        ) == False
-        assert num_ita.is_exact_match(num_usa_pn) == (
-            pn.is_number_match(num_ita, num_usa_pn) == pn.MatchType.EXACT_MATCH
-        ) == False
-    
-    def test_is_any_match(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_can_pn: pn.PhoneNumber,
-    ):
-        num_usa_no_region = num_usa.replace(country_code=0)
-        num_usa_ext = num_usa.replace(extension="1234")
-        num_usa_lead = num_usa.replace(number_of_leading_zeros=1, italian_leading_zero=True)
 
-        ANY_MATCH = pn.MatchType.EXACT_MATCH, pn.MatchType.NSN_MATCH, pn.MatchType.SHORT_NSN_MATCH
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_short_nsn_match_leading_zeros(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    num_pn.italian_leading_zero = not num_pn.italian_leading_zero
+    num_pn.number_of_leading_zeros = 1
 
-        # is any match is True
-        assert num_usa_no_region.is_any_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_no_region, num_usa_pn) in ANY_MATCH
-        ) == True
-        assert num_usa_ext.is_any_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_ext, num_usa_pn) in ANY_MATCH
-        ) == True
-        assert num_usa_lead.is_any_match(num_usa_pn) == (
-            pn.is_number_match(num_usa_lead, num_usa_pn) in ANY_MATCH
-        ) == True
+    num_dg.is_short_nsn_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) == pn.MatchType.SHORT_NSN_MATCH
+    ) == True
 
-        # is any match is False
-        assert num_usa_no_region.is_any_match(num_can_pn) == (
-            pn.is_number_match(num_usa_no_region, num_can_pn) in ANY_MATCH
-        ) == False
-        assert num_usa_ext.is_any_match(num_can_pn) == (
-            pn.is_number_match(num_usa_ext, num_can_pn) in ANY_MATCH
-        ) == False
-        assert num_usa_lead.is_any_match(num_can_pn) == (
-            pn.is_number_match(num_usa_lead, num_can_pn) in ANY_MATCH
-        ) == False
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_nsn_match(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    num_pn.country_code = 0
+
+    # test with object
+    assert num_dg.is_nsn_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) == pn.MatchType.NSN_MATCH
+    ) == True
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_exact_match_true(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+
+    # test with string
+    assert num_dg.is_exact_match(phonenumber) == (
+        pn.is_number_match(num_dg, phonenumber) == pn.MatchType.EXACT_MATCH
+    ) == True
+
+    # test with object
+    assert num_dg.is_exact_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) == pn.MatchType.EXACT_MATCH
+    ) == True
+
+
+@pytest.mark.parametrize("num1,num2", list(zip(PHONE_NUMBERS, PHONE_NUMBERS[1:] + PHONE_NUMBERS[:1]))) 
+def test_is_exact_match_false(num1: str, num2: str) -> None:
+    num_dg = PhoneNumber.parse(num1)
+    num_pn = pn.parse(num2)
+
+    # test with string
+    assert num_dg.is_exact_match(num2) == (
+        pn.is_number_match(num_dg, num2) == pn.MatchType.EXACT_MATCH
+    ) == False
+
+    # test with object
+    assert num_dg.is_exact_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) == pn.MatchType.EXACT_MATCH
+    ) == False
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_any_match_true(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+
+    num_pn_short_nsn = pn.parse(phonenumber)
+    num_pn_short_nsn.extension = "1234"
+
+    num_pn_nsn_match = pn.parse(phonenumber)
+    num_pn_nsn_match.country_code = 0
+
+    ANY_MATCH = pn.MatchType.EXACT_MATCH, pn.MatchType.NSN_MATCH, pn.MatchType.SHORT_NSN_MATCH
+
+    assert num_dg.is_any_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) in ANY_MATCH
+    ) == True
+
+    assert num_dg.is_any_match(num_pn_short_nsn) == (
+        pn.is_number_match(num_dg, num_pn_short_nsn) in ANY_MATCH
+    ) == True
+
+    assert num_dg.is_any_match(num_pn_nsn_match) == (
+        pn.is_number_match(num_dg, num_pn_nsn_match) in ANY_MATCH
+    ) == True
+
+
+@pytest.mark.parametrize("num1,num2", list(zip(PHONE_NUMBERS, PHONE_NUMBERS[1:] + PHONE_NUMBERS[:1])))
+def test_is_any_match_false(num1: str, num2: str) -> None:
+    num_dg = PhoneNumber.parse(num1)
+    num_pn = pn.parse(num2)
+
+    ANY_MATCH = pn.MatchType.EXACT_MATCH, pn.MatchType.NSN_MATCH, pn.MatchType.SHORT_NSN_MATCH
+
+    assert num_dg.is_any_match(num_pn) == (
+        pn.is_number_match(num_dg, num_pn) in ANY_MATCH
+    ) == False

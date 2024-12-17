@@ -2,19 +2,11 @@ import phonenumbers as pn
 import pytest
 from digitz import PhoneNumber
 
-from .fixtures import (
-    USA_EXAMPLE_NUMBER,
-    CAN_EXAMPLE_NUMBER,
-    MEX_EXAMPLE_NUMBER,
-    ITA_EXAMPLE_NUMBER,
-)
+from .parametrize import create_number_list
 
-PHONE_NUMBERS = [
-    USA_EXAMPLE_NUMBER,
-    CAN_EXAMPLE_NUMBER,
-    MEX_EXAMPLE_NUMBER,
-    ITA_EXAMPLE_NUMBER,
-]
+
+PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
+assert len(PHONE_NUMBERS) == 5
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)

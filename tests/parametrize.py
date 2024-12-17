@@ -3,6 +3,24 @@ import phonenumbers as pn
 from digitz import PhoneNumber
 
 
+def create_number_list(regions: list[str], types: list[str | None]) -> tuple[str, ...]:
+    """
+    Create a list of example numbers for the given regions and types.
+    """
+    numbers = []
+    for region in regions:
+        for type_ in types:
+            if type_ is None:
+                numobj = pn.example_number(region)
+            else:
+                numobj = pn.example_number_for_type(region, type_)
+
+            if numobj is not None:
+                numbers.append(pn.format_number(numobj, pn.PhoneNumberFormat.E164))
+
+    return tuple(numbers)
+
+
 USA_EXAMPLE_NUMBER = "+1 (201) 555-0123"
 CAN_EXAMPLE_NUMBER = "+1 506-234-5678"
 MEX_EXAMPLE_NUMBER = "+52 200 123 4567"
