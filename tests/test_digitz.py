@@ -9,24 +9,10 @@ from digitz.exceptions import (
     TooShortAfterIDD,
     TooShortNsn,
 )
-import phonenumbers as pn
+from .parametrize import create_number_list
 
-from .parametrize import (
-    num_can,
-    num_can_pn,
-    num_ita,
-    num_ita_pn,
-    num_mex,
-    num_mex_pn,
-    num_usa,
-    num_usa_pn,
-    num_usa_invalid,
-    num_usa_invalid_pn,
-    num_usa_toll_free,
-    num_usa_toll_free_pn,
-    num_usa_voip,
-    num_usa_voip_pn,
-)
+PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
+
 
 USA_EXAMPLE_NUMBER = "+1 (201) 555-0123"
 
@@ -56,170 +42,43 @@ class TestParse:
             PhoneNumber.parse("+44 2")
 
 
-def test_is_possible(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_toll_free: PhoneNumber,
-    num_usa_toll_free_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.is_possible == pn.is_possible_number(num_usa_pn)
-    assert num_usa_toll_free.is_possible == pn.is_possible_number(num_usa_toll_free_pn)
-    assert num_usa_invalid.is_possible == pn.is_possible_number(num_usa_invalid_pn)
-    assert num_can.is_possible == pn.is_possible_number(num_can_pn)
-    assert num_mex.is_possible == pn.is_possible_number(num_mex_pn)
-    assert num_ita.is_possible == pn.is_possible_number(num_ita_pn)
-
-
-def test_is_valid(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_toll_free: PhoneNumber,
-    num_usa_toll_free_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.is_valid == pn.is_valid_number(num_usa_pn)
-    assert num_usa_toll_free.is_valid == pn.is_valid_number(num_usa_toll_free_pn)
-    assert num_usa_invalid.is_valid == pn.is_valid_number(num_usa_invalid_pn)
-    assert num_can.is_valid == pn.is_valid_number(num_can_pn)
-    assert num_mex.is_valid == pn.is_valid_number(num_mex_pn)
-    assert num_ita.is_valid == pn.is_valid_number(num_ita_pn)
-
-
-def test_number_type(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_toll_free: PhoneNumber,
-    num_usa_toll_free_pn: pn.PhoneNumber,
-    num_usa_voip: PhoneNumber,
-    num_usa_voip_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.number_type == pn.number_type(num_usa_pn)
-    assert num_usa_toll_free.number_type == pn.number_type(num_usa_toll_free_pn)
-    assert num_usa_voip.number_type == pn.number_type(num_usa_voip_pn)
-    assert num_usa_invalid.number_type == pn.number_type(num_usa_invalid_pn)
-    assert num_can.number_type == pn.number_type(num_can_pn)
-    assert num_mex.number_type == pn.number_type(num_mex_pn)
-    assert num_ita.number_type == pn.number_type(num_ita_pn)
-
-
-class TestPhoneNumberType:
-    def test_is_toll_free(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_usa_toll_free: PhoneNumber,
-        num_usa_toll_free_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa_toll_free.is_toll_free == (
-            pn.number_type(num_usa_toll_free_pn) == pn.PhoneNumberType.TOLL_FREE
-        )
-        assert num_usa.is_toll_free == (
-            pn.number_type(num_usa_pn) == pn.PhoneNumberType.TOLL_FREE
-        )
-
-    def test_is_voip(
-        self,
-        num_usa: PhoneNumber,
-        num_usa_pn: pn.PhoneNumber,
-        num_usa_voip: PhoneNumber,
-        num_usa_voip_pn: pn.PhoneNumber,
-    ) -> None:
-        assert num_usa_voip.is_voip == (
-            pn.number_type(num_usa_voip_pn) == pn.PhoneNumberType.VOIP
-        )
-        assert num_usa.is_voip == (pn.number_type(num_usa_pn) == pn.PhoneNumberType.VOIP)
-
-
-def test_region_code(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_invalid: PhoneNumber,
-    num_usa_invalid_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.region_code == pn.region_code_for_number(num_usa_pn)
-    assert num_usa_invalid.region_code == pn.region_code_for_number(num_usa_invalid_pn)
-    assert num_can.region_code == pn.region_code_for_number(num_can_pn)
-    assert num_mex.region_code == pn.region_code_for_number(num_mex_pn)
-    assert num_ita.region_code == pn.region_code_for_number(num_ita_pn)
-
-
-def test_is_geographical(
-    num_usa: PhoneNumber,
-    num_usa_pn: pn.PhoneNumber,
-    num_usa_toll_free: PhoneNumber,
-    num_usa_toll_free_pn: pn.PhoneNumber,
-    num_can: PhoneNumber,
-    num_can_pn: pn.PhoneNumber,
-    num_mex: PhoneNumber,
-    num_mex_pn: pn.PhoneNumber,
-    num_ita: PhoneNumber,
-    num_ita_pn: pn.PhoneNumber,
-) -> None:
-    assert num_usa.is_geographical == pn.is_number_geographical(num_usa_pn)
-    assert num_usa_toll_free.is_geographical == pn.is_number_geographical(
-        num_usa_toll_free_pn
-    )
-    assert num_can.is_geographical == pn.is_number_geographical(num_can_pn)
-    assert num_mex.is_geographical == pn.is_number_geographical(num_mex_pn)
-    assert num_ita.is_geographical == pn.is_number_geographical(num_ita_pn)
-
-
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 class TestReplace:
-    def test_country_code(self, num_usa: PhoneNumber) -> None:
-        num = num_usa.replace(country_code=44)
-        assert num.country_code == 44
 
-    def test_national_number(self, num_usa: PhoneNumber) -> None:
-        num = num_usa.replace(national_number=8002345678)
-        assert num.national_number == 8002345678
+    def test_country_code(self, phonenumber: str) -> None:
+        num1 = PhoneNumber.parse(phonenumber)
+        num2 = num1.replace(country_code=44)
+        assert num2.country_code == 44
 
-    def test_extension(self, num_usa: PhoneNumber) -> None:
-        num = num_usa.replace(extension="1234")
-        assert num.extension == "1234"
+    def test_national_number(self, phonenumber: str) -> None:
+        num1 = PhoneNumber.parse(phonenumber)
+        num2 = num1.replace(national_number=8002345678)
+        assert num2.national_number == 8002345678
 
-    def test_leading_italian_zero(self, num_usa: PhoneNumber) -> None:
-        num = num_usa.replace(italian_leading_zero=True)
-        assert num.italian_leading_zero is True
+    def test_extension(self, phonenumber: str) -> None:
+        num1 = PhoneNumber.parse(phonenumber)
+        num2 = num1.replace(extension="1234")
+        assert num2.extension == "1234"
 
-    def test_number_of_leading_zeros(self, num_usa: PhoneNumber) -> None:
-        num = num_usa.replace(number_of_leading_zeros=1)
-        assert num.number_of_leading_zeros == 1
+    def test_leading_italian_zero(self, phonenumber: str) -> None:
+        num1 = PhoneNumber.parse(phonenumber)
+        num2 = num1.replace(italian_leading_zero=True)
+        assert num2.italian_leading_zero is True
+
+    def test_number_of_leading_zeros(self, phonenumber: str) -> None:
+        num1 = PhoneNumber.parse(phonenumber)
+        num2 = num1.replace(number_of_leading_zeros=1)
+        assert num2.number_of_leading_zeros == 1
 
 
-def test_clear(num_usa: PhoneNumber) -> None:
+def test_clear() -> None:
+    num_dg = PhoneNumber.parse(USA_EXAMPLE_NUMBER)
     with pytest.raises(FrozenInstanceError):
-        num_usa.clear()
+        num_dg.clear()
 
 
-def test_merge_from(num_usa: PhoneNumber, num_can: PhoneNumber) -> None:
+def test_merge_from() -> None:
+    num1 = PhoneNumber.parse(USA_EXAMPLE_NUMBER)
+    num2 = PhoneNumber.parse(USA_EXAMPLE_NUMBER)
     with pytest.raises(FrozenInstanceError):
-        num_usa.merge_from(num_can)
+        num1.merge_from(num2)

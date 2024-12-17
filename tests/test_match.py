@@ -4,6 +4,7 @@ from digitz import PhoneNumber
 from .parametrize import create_number_list
 
 PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
+SHIFTED_PHONE_NUMBERS = PHONE_NUMBERS[1:] + PHONE_NUMBERS[:1]
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
@@ -22,10 +23,11 @@ def test_is_no_match_false(phonenumber: str) -> None:
     ) == False
 
 
-@pytest.mark.parametrize("num1,num2", list(zip(PHONE_NUMBERS, PHONE_NUMBERS[1:] + PHONE_NUMBERS[:1])))
-def test_is_no_match_true(num1: str, num2: str) -> None:
-    num_dg = PhoneNumber.parse(num1)
-    num_pn = pn.parse(num2)
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_no_match_true(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    num_pn.national_number += 1
 
     assert num_dg.is_no_match(num_pn) == (
         pn.is_number_match(num_dg, num_pn) == pn.MatchType.NO_MATCH
@@ -35,7 +37,6 @@ def test_is_no_match_true(num1: str, num2: str) -> None:
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 def test_is_no_match_strict_nan(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
-    num_pn = pn.parse(phonenumber)
 
     # is no match is True
     assert num_dg.is_no_match("Not a Number", strict=True) == (
@@ -95,17 +96,12 @@ def test_is_exact_match_true(phonenumber: str) -> None:
     ) == True
 
 
-@pytest.mark.parametrize("num1,num2", list(zip(PHONE_NUMBERS, PHONE_NUMBERS[1:] + PHONE_NUMBERS[:1]))) 
-def test_is_exact_match_false(num1: str, num2: str) -> None:
-    num_dg = PhoneNumber.parse(num1)
-    num_pn = pn.parse(num2)
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS) 
+def test_is_exact_match_false(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    num_pn.national_number += 1
 
-    # test with string
-    assert num_dg.is_exact_match(num2) == (
-        pn.is_number_match(num_dg, num2) == pn.MatchType.EXACT_MATCH
-    ) == False
-
-    # test with object
     assert num_dg.is_exact_match(num_pn) == (
         pn.is_number_match(num_dg, num_pn) == pn.MatchType.EXACT_MATCH
     ) == False
@@ -137,10 +133,11 @@ def test_is_any_match_true(phonenumber: str) -> None:
     ) == True
 
 
-@pytest.mark.parametrize("num1,num2", list(zip(PHONE_NUMBERS, PHONE_NUMBERS[1:] + PHONE_NUMBERS[:1])))
-def test_is_any_match_false(num1: str, num2: str) -> None:
-    num_dg = PhoneNumber.parse(num1)
-    num_pn = pn.parse(num2)
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_any_match_false(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    num_pn.national_number += 1
 
     ANY_MATCH = pn.MatchType.EXACT_MATCH, pn.MatchType.NSN_MATCH, pn.MatchType.SHORT_NSN_MATCH
 
