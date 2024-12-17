@@ -1,6 +1,6 @@
-import pytest
 import phonenumbers as pn
-from digitz import PhoneNumber
+
+USA_EXAMPLE_NUMBER = "+1 (201) 555-0123"
 
 
 def create_number_list(
@@ -26,16 +26,5 @@ def create_number_list(
             if number not in numbers:
                 numbers.append(number)
 
+    assert len(numbers) > 0, "No example numbers found"
     return tuple(numbers)
-
-
-USA_EXAMPLE_NUMBER = "+1 (201) 555-0123"
-CAN_EXAMPLE_NUMBER = "+1 506-234-5678"
-MEX_EXAMPLE_NUMBER = "+52 200 123 4567"
-ITA_EXAMPLE_NUMBER = "+39 02 1234 5678"
-
-USA_FIXED_LINE_EXAMPLE_NUMBER = "+1 201-555-0123"
-USA_MOBILE_EXAMPLE_NUMBER = "+1 201-555-0123"
-USA_TOLL_FREE_EXAMPLE_NUMBER = "+1 800-234-5678"
-USA_VOIP_EXAMPLE_NUMBER = "+1 305-209-0123"
-USA_INVALID_EXAMPLE_NUMBER = "+1 201555012"

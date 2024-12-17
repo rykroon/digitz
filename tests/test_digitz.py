@@ -44,7 +44,6 @@ class TestParse:
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 class TestReplace:
-
     def test_country_code(self, phonenumber: str) -> None:
         num1 = PhoneNumber.parse(phonenumber)
         num2 = num1.replace(country_code=44)

@@ -6,8 +6,12 @@ from .parametrize import create_number_list
 
 REGIONS = ("US", "CA", "MX", "IT", "GB")
 PHONE_NUMBERS = create_number_list(regions=REGIONS, types=[None])
-INVALID_NUMBERS = create_number_list(regions=REGIONS, types=[pn.PhoneNumberType.UNKNOWN])
-TOLL_FREE_NUMBERS = create_number_list(regions=REGIONS, types=[pn.PhoneNumberType.TOLL_FREE])
+INVALID_NUMBERS = create_number_list(
+    regions=REGIONS, types=[pn.PhoneNumberType.UNKNOWN]
+)
+TOLL_FREE_NUMBERS = create_number_list(
+    regions=REGIONS, types=[pn.PhoneNumberType.TOLL_FREE]
+)
 VOIP_NUMBERS = create_number_list(regions=REGIONS, types=[pn.PhoneNumberType.VOIP])
 
 
@@ -22,21 +26,34 @@ def test_national_significant_number(phonenumber: str) -> None:
 def test_national_destination_code_length(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.national_destination_code_length == pn.length_of_national_destination_code(num_pn)
+    assert (
+        num_dg.national_destination_code_length
+        == pn.length_of_national_destination_code(num_pn)
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 def test_national_destination_code(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.national_destination_code == pn.national_significant_number(num_pn)[:pn.length_of_national_destination_code(num_pn)]
+    assert (
+        num_dg.national_destination_code
+        == pn.national_significant_number(num_pn)[
+            : pn.length_of_national_destination_code(num_pn)
+        ]
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 def test_subscriber_number(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.subscriber_number == pn.national_significant_number(num_pn)[pn.length_of_national_destination_code(num_pn):]
+    assert (
+        num_dg.subscriber_number
+        == pn.national_significant_number(num_pn)[
+            pn.length_of_national_destination_code(num_pn) :
+        ]
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
@@ -78,14 +95,22 @@ def test_number_type(phonenumber: str) -> None:
 def test_is_toll_free_true(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.is_toll_free == (pn.number_type(num_pn) == pn.PhoneNumberType.TOLL_FREE) == True
+    assert (
+        num_dg.is_toll_free
+        == (pn.number_type(num_pn) == pn.PhoneNumberType.TOLL_FREE)
+        == True
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 def test_is_toll_free_false(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.is_toll_free == (pn.number_type(num_pn) == pn.PhoneNumberType.TOLL_FREE) == False
+    assert (
+        num_dg.is_toll_free
+        == (pn.number_type(num_pn) == pn.PhoneNumberType.TOLL_FREE)
+        == False
+    )
 
 
 @pytest.mark.parametrize("phonenumber", VOIP_NUMBERS)
@@ -99,7 +124,9 @@ def test_is_voip_true(phonenumber: str) -> None:
 def test_is_voip_true(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.is_voip == (pn.number_type(num_pn) == pn.PhoneNumberType.VOIP) == False
+    assert (
+        num_dg.is_voip == (pn.number_type(num_pn) == pn.PhoneNumberType.VOIP) == False
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
