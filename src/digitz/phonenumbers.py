@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass, field
-from functools import lru_cache, cached_property, wraps
+from functools import lru_cache, cached_property
 from typing import Optional, Tuple, Type, TypeVar, Union
 
 import phonenumbers as pn
@@ -198,40 +198,40 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns whether the phone number type is premium rate."""
         return self.number_type == PhoneNumberType.PREMIUM_RATE
 
-    @property
-    def is_shared_cost(self) -> bool:
-        """Returns whether the phone number type is shared cost."""
-        return self.number_type == PhoneNumberType.SHARED_COST
-    
+    # @property
+    # def is_shared_cost(self) -> bool:
+    #     """Returns whether the phone number type is shared cost."""
+    #     return self.number_type == PhoneNumberType.SHARED_COST
+
     @property
     def is_voip(self) -> bool:
         """Returns whether the phone number type is voip."""
         return self.number_type == PhoneNumberType.VOIP
-    
+
     @property
     def is_personal_number(self) -> bool:
         """Returns whether the phone number type is personal number."""
         return self.number_type == PhoneNumberType.PERSONAL_NUMBER
-    
-    @property
-    def is_pager(self) -> bool:
-        """Returns whether the phone number type is pager."""
-        return self.number_type == PhoneNumberType.PAGER
-    
-    @property
-    def is_uan(self) -> bool:
-        """Returns whether the phone number type is uan."""
-        return self.number_type == PhoneNumberType.UAN
-    
-    @property
-    def is_voicemail(self) -> bool:
-        """Returns whether the phone number type is voicemail."""
-        return self.number_type == PhoneNumberType.VOICEMAIL
 
-    @property
-    def is_unknown(self) -> bool:
-        """Returns whether the phone number type is unknown."""
-        return self.number_type == PhoneNumberType.UNKNOWN
+    # @property
+    # def is_pager(self) -> bool:
+    #     """Returns whether the phone number type is pager."""
+    #     return self.number_type == PhoneNumberType.PAGER
+
+    # @property
+    # def is_uan(self) -> bool:
+    #     """Returns whether the phone number type is uan."""
+    #     return self.number_type == PhoneNumberType.UAN
+
+    # @property
+    # def is_voicemail(self) -> bool:
+    #     """Returns whether the phone number type is voicemail."""
+    #     return self.number_type == PhoneNumberType.VOICEMAIL
+
+    # @property
+    # def is_unknown(self) -> bool:
+    #     """Returns whether the phone number type is unknown."""
+    #     return self.number_type == PhoneNumberType.UNKNOWN
 
     @cached_property
     def timezones(self) -> Tuple[BaseTzInfo, ...]:
@@ -252,22 +252,22 @@ class PhoneNumber(pn.PhoneNumber):
         """
         return MatchType(pn.is_number_match(self, other))
 
-    def is_no_match(
-        self, other: Union[str, pn.PhoneNumber], /, *, strict: bool = False
-    ) -> bool:
-        """Returns True if the other phone number is not a match.
+    # def is_no_match(
+    #     self, other: Union[str, pn.PhoneNumber], /, *, strict: bool = False
+    # ) -> bool:
+    #     """Returns True if the other phone number is not a match.
 
-        Parameters:
-            other: The other phone number to compare.
-            strict: Whether to strictly check if the other phone number is not a match. If False, it will also return True if the other phone number is not a number.
+    #     Parameters:
+    #         other: The other phone number to compare.
+    #         strict: Whether to strictly check if the other phone number is not a match. If False, it will also return True if the other phone number is not a number.
 
-        Returns:
-            True if the other phone number is not a match.
-        """
-        if strict:
-            return self.match(other) == MatchType.NO_MATCH
-        else:
-            return self.match(other) in (MatchType.NO_MATCH, MatchType.NOT_A_NUMBER)
+    #     Returns:
+    #         True if the other phone number is not a match.
+    #     """
+    #     if strict:
+    #         return self.match(other) == MatchType.NO_MATCH
+    #     else:
+    #         return self.match(other) in (MatchType.NO_MATCH, MatchType.NOT_A_NUMBER)
 
     def is_short_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
         """Returns True if the other phone number is a short NSN match."""
