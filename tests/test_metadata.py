@@ -7,7 +7,7 @@ import pytz
 
 from digitz import PhoneNumber
 
-from .parametrize import create_number_list
+from .utils import create_number_list
 
 PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
 

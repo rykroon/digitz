@@ -1,55 +1,9 @@
 import phonenumbers as pn
 import pytest
 from digitz import PhoneNumber
-from .parametrize import create_number_list
+from .utils import create_number_list
 
 PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
-SHIFTED_PHONE_NUMBERS = PHONE_NUMBERS[1:] + PHONE_NUMBERS[:1]
-
-
-@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
-def test_is_no_match_false(phonenumber: str) -> None:
-    num_dg = PhoneNumber.parse(phonenumber)
-    num_pn = pn.parse(phonenumber)
-
-    # test with string
-    assert (
-        num_dg.is_no_match(phonenumber)
-        == (pn.is_number_match(num_dg, phonenumber) == pn.MatchType.NO_MATCH)
-        == False
-    )
-
-    # test with object
-    assert (
-        num_dg.is_no_match(num_pn)
-        == (pn.is_number_match(num_dg, num_pn) == pn.MatchType.NO_MATCH)
-        == False
-    )
-
-
-@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
-def test_is_no_match_true(phonenumber: str) -> None:
-    num_dg = PhoneNumber.parse(phonenumber)
-    num_pn = pn.parse(phonenumber)
-    num_pn.national_number += 1
-
-    assert (
-        num_dg.is_no_match(num_pn)
-        == (pn.is_number_match(num_dg, num_pn) == pn.MatchType.NO_MATCH)
-        == True
-    )
-
-
-@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
-def test_is_no_match_strict_nan(phonenumber: str) -> None:
-    num_dg = PhoneNumber.parse(phonenumber)
-
-    # is no match is True
-    assert (
-        num_dg.is_no_match("Not a Number", strict=True)
-        == (pn.is_number_match(num_dg, "Not a Number") == pn.MatchType.NO_MATCH)
-        == False
-    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)

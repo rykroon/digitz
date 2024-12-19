@@ -1,10 +1,11 @@
+from typing import Union
 import phonenumbers as pn
 
 USA_EXAMPLE_NUMBER = "+1 (201) 555-0123"
 
 
 def create_number_list(
-    regions: list[str], types: list[pn.PhoneNumberType | None]
+    regions: list[str], types: list[Union[pn.PhoneNumberType, None]]
 ) -> tuple[str, ...]:
     """
     Create a list of example numbers for the given regions and types.

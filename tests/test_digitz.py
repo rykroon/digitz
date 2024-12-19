@@ -9,7 +9,7 @@ from digitz.exceptions import (
     TooShortAfterIDD,
     TooShortNsn,
 )
-from .parametrize import create_number_list
+from .utils import create_number_list
 
 PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
 
