@@ -5,7 +5,7 @@ USA_EXAMPLE_NUMBER = "+1 (201) 555-0123"
 
 
 def create_number_list(
-    regions: list[str], types: list[Union[pn.PhoneNumberType, None]]
+    regions: list[str], types: list[Union[int, None]]
 ) -> tuple[str, ...]:
     """
     Create a list of example numbers for the given regions and types.

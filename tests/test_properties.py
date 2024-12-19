@@ -5,7 +5,7 @@ from digitz import PhoneNumber
 from .utils import create_number_list
 
 
-REGIONS = ("US", "CA", "MX", "IT", "GB")
+REGIONS = ["US", "CA", "MX", "IT", "GB"]
 PHONE_NUMBERS = create_number_list(regions=REGIONS, types=[None])
 FIXED_LINE_NUMBERS = create_number_list(regions=REGIONS, types=[PT.FIXED_LINE])
 MOBILE_NUMBERS = create_number_list(regions=REGIONS, types=[PT.MOBILE])
