@@ -3,6 +3,7 @@ import phonenumbers as pn
 import pytest
 
 from digitz import PhoneNumber, parse
+from digitz.enums import PhoneNumberType
 from digitz.exceptions import (
     InvalidCountryCode,
     NotANumber,
@@ -72,11 +73,10 @@ class TestReplace:
 
 
 @pytest.mark.parametrize("region", ["US", "CA", "MX", "IT", "GB"])
-def test_example_number(region: str) -> None:
-    assert PhoneNumber.example_number(region=region) == pn.example_number(region)
+@pytest.mark.parametrize("type", list(PhoneNumberType))
+def test_example_number(region: str, type: PhoneNumberType) -> None:
+    assert PhoneNumber.example_number(region, type) == pn.example_number_for_type(region, type)
 
-    ...
-    # add more tests
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 def test_eq_true(phonenumber: str) -> None:
@@ -94,6 +94,37 @@ def test_eq_false(phonenumber: str) -> None:
 
     assert num_dg != num_pn
     assert num_pn != num_dg
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_to_dict(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+
+    assert num_dg.to_dict() == {
+        "country_code": num_dg.country_code,
+        "national_number": num_dg.national_number,
+        "extension": num_dg.extension,
+        "italian_leading_zero": num_dg.italian_leading_zero,
+        "number_of_leading_zeros": num_dg.number_of_leading_zeros,
+        "raw_input": num_dg.raw_input,
+        "country_code_source": num_dg.country_code_source,
+        "preferred_domestic_carrier_code": num_dg.preferred_domestic_carrier_code,
+    }
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_to_tuple(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    assert num_dg.to_tuple() == (
+        num_dg.country_code,
+        num_dg.national_number,
+        num_dg.extension,
+        num_dg.italian_leading_zero,
+        num_dg.number_of_leading_zeros,
+        num_dg.raw_input,
+        num_dg.country_code_source,
+        num_dg.preferred_domestic_carrier_code,
+    )
 
 
 def test_clear() -> None:

@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2023-present Ryan Kroon <rykroon.tech@gmail.com>
 #
 # SPDX-License-Identifier: MIT
-from dataclasses import dataclass, field
+from dataclasses import asdict, astuple, dataclass, field
 from functools import lru_cache, cached_property
-from typing import Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
 
 import phonenumbers as pn
 import pytz
@@ -32,7 +32,7 @@ Self = TypeVar("Self", bound="PhoneNumber")
 class PhoneNumber(pn.PhoneNumber):
     """
     A dataclass representing a phone number.
-    
+
     Parameters:
         country_code: The country code of the phone number.
         national_number: The national number of the phone number.
@@ -63,19 +63,19 @@ class PhoneNumber(pn.PhoneNumber):
         keep_raw_input: bool = False,
     ) -> Self:
         """Attempts to parse a string and return a new PhoneNumber object.
-        
+
         Parameters:
             number: The phone number to parse.
             region: The region code the phone number is expected to be from.
             keep_raw_input: Whether to keep the raw input of the phone number.
-        
+
         Raises:
             InvalidCountryCode: If the country code is invalid.
             NotANumber: If the phone number is not a number.
             TooLong: If the phone number is too long.
             TooShortAfterIDD: If the phone number is too short after IDD.
             TooShortNsn: If the phone number is too short after the country code.
-        
+
         Returns:
             A new PhoneNumber object.
         """
@@ -101,17 +101,9 @@ class PhoneNumber(pn.PhoneNumber):
             else:
                 raise e  # pragma: no cover
 
-        # Set default values for country_code and national_number
-        # to avoid type checking errors
-        if numobj.country_code is None:
-            numobj.country_code = 0  # pragma: no cover
-
-        if numobj.national_number is None:
-            numobj.national_number = 0  # pragma: no cover
-
         return cls(
-            country_code=numobj.country_code,
-            national_number=numobj.national_number,
+            country_code=numobj.country_code or 0,
+            national_number=numobj.national_number or 0,
             extension=numobj.extension,
             italian_leading_zero=bool(numobj.italian_leading_zero),
             number_of_leading_zeros=numobj.number_of_leading_zeros,
@@ -123,16 +115,15 @@ class PhoneNumber(pn.PhoneNumber):
     @classmethod
     def example_number(
         cls: Type[Self],
-        *,
         region: str,
         number_type: PhoneNumberType = PhoneNumberType.FIXED_LINE,
     ) -> Self | None:
         """Returns an example phone number for the specified region and number type.
-        
+
         Parameters:
             region: The region code of the phone number.
             number_type: The type of phone number.
-        
+
         Returns:
             An example phone number for the specified region and number type.
         """
@@ -194,7 +185,7 @@ class PhoneNumber(pn.PhoneNumber):
     def is_nanpa_country(self) -> bool:
         """Returns True if the phone number is from a NANPA country."""
         if self.region_code is None:
-            return False
+            return False  # pragma: no cover
         return pn.is_nanpa_country(self.region_code)
 
     # ~~~ phone number validity properties ~~~
@@ -314,7 +305,9 @@ class PhoneNumber(pn.PhoneNumber):
     def is_any_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
         """Returns True if the other phone number is any match."""
         return self.match(other) in (
-            MatchType.EXACT_MATCH, MatchType.NSN_MATCH, MatchType.SHORT_NSN_MATCH
+            MatchType.EXACT_MATCH,
+            MatchType.NSN_MATCH,
+            MatchType.SHORT_NSN_MATCH,
         )
 
     # ~~~ Carrier and country name methods ~~~
@@ -367,6 +360,23 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns the RFC3966 representation of the phone number."""
         return self.format(PhoneNumberFormat.RFC3966)
 
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    def to_tuple(
+        self,
+    ) -> Tuple[
+        int,
+        int,
+        Optional[str],
+        bool,
+        Optional[int],
+        Optional[str],
+        CountryCodeSource,
+        Optional[str],
+    ]:
+        return astuple(self)
+
     def replace(
         self: Self,
         *,
@@ -377,14 +387,14 @@ class PhoneNumber(pn.PhoneNumber):
         number_of_leading_zeros: Optional[int] = None,
     ) -> Self:
         """Returns a new phone number with the specified attributes replaced.
-        
+
         Parameters:
             country_code: The country code of the phone number.
             national_number: The national number of the phone number.
             extension: The extension of the phone number.
             italian_leading_zero: Whether the phone number has an Italian leading zero.
             number_of_leading_zeros: The number of leading zeros in the phone number.
-        
+
         Returns:
             A new PhoneNumber object
         """
@@ -420,7 +430,7 @@ def parse(
     keep_raw_input: bool = False,
 ) -> PhoneNumber:
     """Convenience function to parse a phone number.
-    
+
     See `digitz.PhoneNumber.parse` for details.
     """
     return PhoneNumber.parse(number, region=region, keep_raw_input=keep_raw_input)
