@@ -120,6 +120,40 @@ class PhoneNumber(pn.PhoneNumber):
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
 
+    @classmethod
+    def example_number(
+        cls: Type[Self],
+        *,
+        region: str,
+        number_type: PhoneNumberType = PhoneNumberType.FIXED_LINE,
+    ) -> Self | None:
+        """Returns an example phone number for the specified region and number type.
+        
+        Parameters:
+            region: The region code of the phone number.
+            number_type: The type of phone number.
+        
+        Returns:
+            An example phone number for the specified region and number type.
+        """
+        pn_numobj = pn.example_number_for_type(region, number_type)
+        if pn_numobj is None:
+            return None
+
+        return cls(
+            country_code=pn_numobj.country_code or 0,
+            national_number=pn_numobj.national_number or 0,
+            extension=pn_numobj.extension,
+            italian_leading_zero=bool(pn_numobj.italian_leading_zero),
+            number_of_leading_zeros=pn_numobj.number_of_leading_zeros,
+            raw_input=pn_numobj.raw_input,
+            country_code_source=CountryCodeSource(pn_numobj.country_code_source),
+            preferred_domestic_carrier_code=pn_numobj.preferred_domestic_carrier_code,
+        )
+
+    def __ne__(self, other: object) -> bool:
+        return not self == other
+
     def __str__(self) -> str:
         """Returns the E.164 representation of the phone number."""
         return self.to_e164()
@@ -156,6 +190,13 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns True if the phone number has a geographical association."""
         return pn.is_number_geographical(self)
 
+    @cached_property
+    def is_nanpa_country(self) -> bool:
+        """Returns True if the phone number is from a NANPA country."""
+        if self.region_code is None:
+            return False
+        return pn.is_nanpa_country(self.region_code)
+
     # ~~~ phone number validity properties ~~~
     @cached_property
     def is_possible(self) -> bool:
@@ -165,7 +206,9 @@ class PhoneNumber(pn.PhoneNumber):
     @cached_property
     def is_valid(self) -> bool:
         """Returns True if the phone number is of a valid pattern."""
-        return pn.is_valid_number(self)
+        if self.region_code is None:
+            return False
+        return pn.is_valid_number_for_region(self, self.region_code)
 
     # ~~~ Number type properties ~~~
     @cached_property
@@ -252,23 +295,6 @@ class PhoneNumber(pn.PhoneNumber):
         """
         return MatchType(pn.is_number_match(self, other))
 
-    # def is_no_match(
-    #     self, other: Union[str, pn.PhoneNumber], /, *, strict: bool = False
-    # ) -> bool:
-    #     """Returns True if the other phone number is not a match.
-
-    #     Parameters:
-    #         other: The other phone number to compare.
-    #         strict: Whether to strictly check if the other phone number is not a match. If False, it will also return True if the other phone number is not a number.
-
-    #     Returns:
-    #         True if the other phone number is not a match.
-    #     """
-    #     if strict:
-    #         return self.match(other) == MatchType.NO_MATCH
-    #     else:
-    #         return self.match(other) in (MatchType.NO_MATCH, MatchType.NOT_A_NUMBER)
-
     def is_short_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
         """Returns True if the other phone number is a short NSN match."""
         return self.match(other) == MatchType.SHORT_NSN_MATCH
@@ -281,12 +307,17 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns True if the other phone number is an exact match."""
         return self.match(other) == MatchType.EXACT_MATCH
 
+    def is_any_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+        """Returns True if the other phone number is any NSN match."""
+        return self.match(other) in (MatchType.SHORT_NSN_MATCH, MatchType.NSN_MATCH)
+
     def is_any_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
         """Returns True if the other phone number is any match."""
         return self.match(other) in (
             MatchType.EXACT_MATCH, MatchType.NSN_MATCH, MatchType.SHORT_NSN_MATCH
         )
 
+    # ~~~ Carrier and country name methods ~~~
     @lru_cache
     def get_carrier_name(self, lang: str) -> str:
         """Returns the carrier name of the phone number."""

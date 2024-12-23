@@ -184,3 +184,10 @@ def test_is_geographical(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
     assert num_dg.is_geographical == pn.is_number_geographical(num_pn)
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_nanpa_country(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    assert num_dg.is_nanpa_country == pn.is_nanpa_country(pn.region_code_for_number(num_pn))

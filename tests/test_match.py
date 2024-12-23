@@ -80,6 +80,60 @@ def test_is_exact_match_false(phonenumber: str) -> None:
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_any_nsn_match_true(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+
+    num_pn_short_nsn = pn.parse(phonenumber)
+    num_pn_short_nsn.extension = "1234"
+
+    num_pn_nsn_match = pn.parse(phonenumber)
+    num_pn_nsn_match.country_code = 0
+
+    ANY_NSN_MATCH = (pn.MatchType.NSN_MATCH, pn.MatchType.SHORT_NSN_MATCH)
+
+    assert (
+        num_dg.is_any_nsn_match(num_pn_short_nsn)
+        == (pn.is_number_match(num_dg, num_pn_short_nsn) in ANY_NSN_MATCH)
+        == True
+    )
+    assert (
+        num_dg.is_any_nsn_match(num_pn_nsn_match)
+        == (pn.is_number_match(num_dg, num_pn_nsn_match) in ANY_NSN_MATCH)
+        == True
+    )
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_is_any_nsn_match_false(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+
+    ANY_NSN_MATCH = (pn.MatchType.NSN_MATCH, pn.MatchType.SHORT_NSN_MATCH)
+
+    # exact match is False
+    assert (
+        num_dg.is_any_nsn_match(num_pn)
+        == (pn.is_number_match(num_dg, num_pn) in ANY_NSN_MATCH)
+        == False
+    )
+
+    # not a match is False
+    num_pn.national_number += 1
+    assert (
+        num_dg.is_any_nsn_match(num_pn)
+        == (pn.is_number_match(num_dg, num_pn) in ANY_NSN_MATCH)
+        == False
+    )
+
+    # not a number is False
+    assert (
+        num_dg.is_any_nsn_match("foobar")
+        == (pn.is_number_match(num_dg, "foobar") in ANY_NSN_MATCH)
+        == False
+    )
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 def test_is_any_match_true(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)

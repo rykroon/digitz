@@ -1,4 +1,5 @@
 from dataclasses import FrozenInstanceError
+import phonenumbers as pn
 import pytest
 
 from digitz import PhoneNumber, parse
@@ -68,6 +69,31 @@ class TestReplace:
         num1 = PhoneNumber.parse(phonenumber)
         num2 = num1.replace(number_of_leading_zeros=1)
         assert num2.number_of_leading_zeros == 1
+
+
+@pytest.mark.parametrize("region", ["US", "CA", "MX", "IT", "GB"])
+def test_example_number(region: str) -> None:
+    assert PhoneNumber.example_number(region=region) == pn.example_number(region)
+
+    ...
+    # add more tests
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_eq_true(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    assert num_dg == num_pn
+    assert num_pn == num_dg
+
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_eq_false(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_pn = pn.parse(phonenumber)
+    num_pn.national_number += 1
+
+    assert num_dg != num_pn
+    assert num_pn != num_dg
 
 
 def test_clear() -> None:
