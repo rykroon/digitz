@@ -232,10 +232,10 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns whether the phone number type is premium rate."""
         return self.number_type == PhoneNumberType.PREMIUM_RATE
 
-    # @property
-    # def is_shared_cost(self) -> bool:
-    #     """Returns whether the phone number type is shared cost."""
-    #     return self.number_type == PhoneNumberType.SHARED_COST
+    @property
+    def is_shared_cost(self) -> bool:
+        """Returns whether the phone number type is shared cost."""
+        return self.number_type == PhoneNumberType.SHARED_COST
 
     @property
     def is_voip(self) -> bool:
@@ -247,25 +247,20 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns whether the phone number type is personal number."""
         return self.number_type == PhoneNumberType.PERSONAL_NUMBER
 
-    # @property
-    # def is_pager(self) -> bool:
-    #     """Returns whether the phone number type is pager."""
-    #     return self.number_type == PhoneNumberType.PAGER
+    @property
+    def is_pager(self) -> bool:
+        """Returns whether the phone number type is pager."""
+        return self.number_type == PhoneNumberType.PAGER
 
-    # @property
-    # def is_uan(self) -> bool:
-    #     """Returns whether the phone number type is uan."""
-    #     return self.number_type == PhoneNumberType.UAN
+    @property
+    def is_uan(self) -> bool:
+        """Returns whether the phone number type is a universal access number."""
+        return self.number_type == PhoneNumberType.UAN
 
-    # @property
-    # def is_voicemail(self) -> bool:
-    #     """Returns whether the phone number type is voicemail."""
-    #     return self.number_type == PhoneNumberType.VOICEMAIL
-
-    # @property
-    # def is_unknown(self) -> bool:
-    #     """Returns whether the phone number type is unknown."""
-    #     return self.number_type == PhoneNumberType.UNKNOWN
+    @property
+    def is_voicemail(self) -> bool:
+        """Returns whether the phone number type is a voicemail access number."""
+        return self.number_type == PhoneNumberType.VOICEMAIL
 
     @cached_property
     def timezones(self) -> Tuple[BaseTzInfo, ...]:
