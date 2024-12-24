@@ -13,7 +13,7 @@ from digitz.exceptions import (
 )
 from .utils import create_number_list
 
-PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
+PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"])
 
 
 USA_EXAMPLE_NUMBER = "+1 (201) 555-0123"

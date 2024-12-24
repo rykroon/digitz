@@ -5,7 +5,7 @@ from digitz import PhoneNumber
 from .utils import create_number_list
 
 
-PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"], types=[None])
+PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"])
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
