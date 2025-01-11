@@ -102,7 +102,7 @@ class PhoneNumber(pn.PhoneNumber):
         cls: Type[Self],
         region: str,
         number_type: PhoneNumberType = PhoneNumberType.FIXED_LINE,
-    ) -> Self | None:
+    ) -> Optional[Self]:
         """Returns an example phone number for the specified region and number type.
 
         Parameters:
