@@ -18,6 +18,11 @@ from digitz.enums import (
 )
 
 
+class _MISSING_TYPE:
+    pass
+MISSING = _MISSING_TYPE()
+
+
 Self = TypeVar("Self", bound="PhoneNumber")
 
 
@@ -353,11 +358,11 @@ class PhoneNumber(pn.PhoneNumber):
     def replace(
         self: Self,
         *,
-        country_code: Optional[int] = None,
-        national_number: Optional[int] = None,
-        extension: Optional[str] = None,
-        italian_leading_zero: Optional[bool] = None,
-        number_of_leading_zeros: Optional[int] = None,
+        country_code: Union[int, _MISSING_TYPE] = MISSING,
+        national_number: Union[int, _MISSING_TYPE] = MISSING,
+        extension: Union[Optional[str], _MISSING_TYPE] = MISSING,
+        italian_leading_zero: Union[bool, _MISSING_TYPE] = MISSING,
+        number_of_leading_zeros: Union[Optional[int], _MISSING_TYPE] = MISSING,
     ) -> Self:
         """Returns a new phone number with the specified attributes replaced.
 
@@ -371,19 +376,19 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             A new PhoneNumber object
         """
-        if country_code is None:
+        if  isinstance(country_code, _MISSING_TYPE):
             country_code = self.country_code
 
-        if national_number is None:
+        if isinstance(national_number, _MISSING_TYPE):
             national_number = self.national_number
 
-        if extension is None:
+        if isinstance(extension, _MISSING_TYPE):
             extension = self.extension
 
-        if italian_leading_zero is None:
+        if isinstance(italian_leading_zero, _MISSING_TYPE):
             italian_leading_zero = self.italian_leading_zero
 
-        if number_of_leading_zeros is None:
+        if isinstance(number_of_leading_zeros, _MISSING_TYPE):
             number_of_leading_zeros = self.number_of_leading_zeros
 
         return type(self)(
