@@ -2,7 +2,7 @@ from dataclasses import FrozenInstanceError
 import phonenumbers as pn
 import pytest
 
-from digitz import PhoneNumber, parse
+from digitz import PhoneNumber
 from digitz.enums import PhoneNumberType
 from .utils import create_number_list
 
@@ -18,31 +18,31 @@ class TestParse:
 
     def test_invalid_country_code(self) -> None:
         try:
-            parse("+999 (201) 555-0123")
+            PhoneNumber.parse("+999 (201) 555-0123")
         except pn.NumberParseException as e:
             assert e.error_type == pn.NumberParseException.INVALID_COUNTRY_CODE
 
     def test_not_a_number(self) -> None:
         try:
-            parse("foo")
+            PhoneNumber.parse("foo")
         except pn.NumberParseException as e:
             assert e.error_type == pn.NumberParseException.NOT_A_NUMBER
 
     def test_too_long(self) -> None:
         try:
-            parse("+1 (201) 555-0123012301230123")
+            PhoneNumber.parse("+1 (201) 555-0123012301230123")
         except pn.NumberParseException as e:
             assert e.error_type == pn.NumberParseException.TOO_LONG
 
     def test_too_short_after_idd(self) -> None:
         try:
-            parse("011", region="US")
+            PhoneNumber.parse("011", region="US")
         except pn.NumberParseException as e:
             assert e.error_type == pn.NumberParseException.TOO_SHORT_AFTER_IDD
 
     def test_too_short_nsn(self) -> None:
         try:
-            parse("+44 2")
+            PhoneNumber.parse("+44 2")
         except pn.NumberParseException as e:
             assert e.error_type == pn.NumberParseException.TOO_SHORT_NSN
 

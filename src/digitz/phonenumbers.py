@@ -398,17 +398,3 @@ class PhoneNumber(pn.PhoneNumber):
             italian_leading_zero=italian_leading_zero,
             number_of_leading_zeros=number_of_leading_zeros,
         )
-
-
-def parse(
-    number: str,
-    /,
-    *,
-    region: Optional[str] = None,
-    keep_raw_input: bool = False,
-) -> PhoneNumber:
-    """Convenience function to parse a phone number.
-
-    See `digitz.PhoneNumber.parse` for details.
-    """
-    return PhoneNumber.parse(number, region=region, keep_raw_input=keep_raw_input)
