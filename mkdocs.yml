@@ -39,7 +39,6 @@ nav:
   - API Reference:
     - Phone Numbers: apiref/phonenumbers.md
     - Enums: apiref/enums.md
-    - Exceptions: apiref/exceptions.md
 
 
 watch:

@@ -4,13 +4,6 @@ import pytest
 
 from digitz import PhoneNumber, parse
 from digitz.enums import PhoneNumberType
-from digitz.exceptions import (
-    InvalidCountryCode,
-    NotANumber,
-    TooLong,
-    TooShortAfterIDD,
-    TooShortNsn,
-)
 from .utils import create_number_list
 
 PHONE_NUMBERS = create_number_list(regions=["US", "CA", "MX", "IT", "GB"])
@@ -24,24 +17,34 @@ class TestParse:
         assert isinstance(PhoneNumber.parse(USA_EXAMPLE_NUMBER), PhoneNumber)
 
     def test_invalid_country_code(self) -> None:
-        with pytest.raises(InvalidCountryCode):
+        try:
             parse("+999 (201) 555-0123")
+        except pn.NumberParseException as e:
+            assert e.error_type == pn.NumberParseException.INVALID_COUNTRY_CODE
 
     def test_not_a_number(self) -> None:
-        with pytest.raises(NotANumber):
+        try:
             parse("foo")
+        except pn.NumberParseException as e:
+            assert e.error_type == pn.NumberParseException.NOT_A_NUMBER
 
     def test_too_long(self) -> None:
-        with pytest.raises(TooLong):
+        try:
             parse("+1 (201) 555-0123012301230123")
+        except pn.NumberParseException as e:
+            assert e.error_type == pn.NumberParseException.TOO_LONG
 
     def test_too_short_after_idd(self) -> None:
-        with pytest.raises(TooShortAfterIDD):
+        try:
             parse("011", region="US")
+        except pn.NumberParseException as e:
+            assert e.error_type == pn.NumberParseException.TOO_SHORT_AFTER_IDD
 
     def test_too_short_nsn(self) -> None:
-        with pytest.raises(TooShortNsn):
-            PhoneNumber.parse("+44 2")
+        try:
+            parse("+44 2")
+        except pn.NumberParseException as e:
+            assert e.error_type == pn.NumberParseException.TOO_SHORT_NSN
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)

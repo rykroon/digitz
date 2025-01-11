@@ -16,13 +16,6 @@ from digitz.enums import (
     PhoneNumberFormat,
     PhoneNumberType,
 )
-from digitz.exceptions import (
-    InvalidCountryCode,
-    NotANumber,
-    TooLong,
-    TooShortAfterIDD,
-    TooShortNsn,
-)
 
 
 Self = TypeVar("Self", bound="PhoneNumber")
@@ -83,23 +76,8 @@ class PhoneNumber(pn.PhoneNumber):
             numobj = pn.parse(number, region=region, keep_raw_input=keep_raw_input)
 
         except pn.NumberParseException as e:
-            if e.error_type == NumberParseErrorType.INVALID_COUNTRY_CODE:
-                raise InvalidCountryCode(e._msg) from e
-
-            elif e.error_type == NumberParseErrorType.NOT_A_NUMBER:
-                raise NotANumber(e._msg) from e
-
-            elif e.error_type == NumberParseErrorType.TOO_LONG:
-                raise TooLong(e._msg) from e
-
-            elif e.error_type == NumberParseErrorType.TOO_SHORT_AFTER_IDD:
-                raise TooShortAfterIDD(e._msg) from e
-
-            elif e.error_type == NumberParseErrorType.TOO_SHORT_NSN:
-                raise TooShortNsn(e._msg) from e
-
-            else:
-                raise e  # pragma: no cover
+            e.error_type = NumberParseErrorType(e.error_type)
+            raise e
 
         return cls(
             country_code=numobj.country_code or 0,
