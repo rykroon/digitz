@@ -20,6 +20,8 @@ from digitz.enums import (
 
 class _MISSING_TYPE:
     pass
+
+
 MISSING = _MISSING_TYPE()
 
 
@@ -376,7 +378,7 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             A new PhoneNumber object
         """
-        if  isinstance(country_code, _MISSING_TYPE):
+        if isinstance(country_code, _MISSING_TYPE):
             country_code = self.country_code
 
         if isinstance(national_number, _MISSING_TYPE):

@@ -22,7 +22,6 @@ UAN_NUMBERS = create_number_list(REGIONS, PT.UAN)
 VOICEMAIL_NUMBERS = create_number_list(REGIONS, PT.VOICEMAIL)
 
 
-
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 def test_number_type(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
@@ -91,7 +90,9 @@ def test_is_premium_rate_true(phonenumber: str) -> None:
 def test_is_premium_rate_false(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.is_premium_rate == (pn.number_type(num_pn) == PT.PREMIUM_RATE) == False
+    assert (
+        num_dg.is_premium_rate == (pn.number_type(num_pn) == PT.PREMIUM_RATE) == False
+    )
 
 
 @pytest.mark.parametrize("phonenumber", SHARED_COST_NUMBERS)
@@ -126,14 +127,22 @@ def test_is_voip_false(phonenumber: str) -> None:
 def test_is_personal_number_true(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.is_personal_number == (pn.number_type(num_pn) == PT.PERSONAL_NUMBER) == True
+    assert (
+        num_dg.is_personal_number
+        == (pn.number_type(num_pn) == PT.PERSONAL_NUMBER)
+        == True
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
 def test_is_personal_number_false(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.is_personal_number == (pn.number_type(num_pn) == PT.PERSONAL_NUMBER) == False
+    assert (
+        num_dg.is_personal_number
+        == (pn.number_type(num_pn) == PT.PERSONAL_NUMBER)
+        == False
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PAGER_NUMBERS)

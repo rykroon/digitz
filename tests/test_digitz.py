@@ -78,7 +78,9 @@ class TestReplace:
 @pytest.mark.parametrize("region", ["US", "CA", "MX", "IT", "GB"])
 @pytest.mark.parametrize("type", list(PhoneNumberType))
 def test_example_number(region: str, type: PhoneNumberType) -> None:
-    assert PhoneNumber.example_number(region, type) == pn.example_number_for_type(region, type)
+    assert PhoneNumber.example_number(region, type) == pn.example_number_for_type(
+        region, type
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
