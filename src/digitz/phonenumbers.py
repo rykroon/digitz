@@ -70,11 +70,7 @@ class PhoneNumber(pn.PhoneNumber):
             keep_raw_input: Whether to keep the raw input of the phone number.
 
         Raises:
-            InvalidCountryCode: If the country code is invalid.
-            NotANumber: If the phone number is not a number.
-            TooLong: If the phone number is too long.
-            TooShortAfterIDD: If the phone number is too short after IDD.
-            TooShortNsn: If the phone number is too short after the country code.
+            NumberParseException: If the phone number is cannot be parsed.
 
         Returns:
             A new PhoneNumber object.
@@ -316,11 +312,12 @@ class PhoneNumber(pn.PhoneNumber):
     @lru_cache
     def format(self, format: PhoneNumberFormat) -> str:
         """Returns the string representation of the phone number in the specified format.
+
         Parameters:
             format: The format to use.
 
-            Returns:
-                The string representation of the phone number.
+        Returns:
+            The string representation of the phone number.
         """
         return pn.format_number(self, format)
 
