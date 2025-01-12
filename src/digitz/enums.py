@@ -12,7 +12,15 @@ __all__ = [
 
 
 class CountryCodeSource(IntEnum):
-    """Enum for phone number country code sources."""
+    """Enum for phone number country code sources.
+    
+    Attributes:
+        UNSPECIFIED: Country code source is unspecified.
+        FROM_NUMBER_WITH_PLUS_SIGN: Country code was extracted from number with a leading '+' sign.
+        FROM_NUMBER_WITH_IDD: Country code was extracted from number with an IDD prefix.
+        FROM_NUMBER_WITHOUT_PLUS_SIGN: Country code was extracted from number without a leading '+' sign.
+        FROM_DEFAULT_COUNTRY: Country code was extracted from number with a default country code.
+    """
 
     UNSPECIFIED = pn.CountryCodeSource.UNSPECIFIED
     FROM_NUMBER_WITH_PLUS_SIGN = pn.CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN
@@ -22,7 +30,15 @@ class CountryCodeSource(IntEnum):
 
 
 class MatchType(IntEnum):
-    """Enum for phone number match types."""
+    """Enum for phone number match types.
+    
+    Attributes:
+        EXACT_MATCH: Exact match.
+        NOT_A_NUMBER: Number is not a number.
+        NO_MATCH: No match.
+        NSN_MATCH: National significant number match.
+        SHORT_NSN_MATCH: Short national significant number match.
+    """
 
     EXACT_MATCH = pn.MatchType.EXACT_MATCH
     NOT_A_NUMBER = pn.MatchType.NOT_A_NUMBER
@@ -32,7 +48,15 @@ class MatchType(IntEnum):
 
 
 class NumberParseErrorType(IntEnum):
-    """Enum for phone number parsing error types."""
+    """Enum for phone number parsing error types.
+    
+    Attributes:
+        INVALID_COUNTRY_CODE: Invalid country code.
+        NOT_A_NUMBER: Number is not a number.
+        TOO_SHORT_AFTER_IDD: Number is too short after IDD.
+        TOO_SHORT_NSN: Number is too short.
+        TOO_LONG: Number is too long.
+    """
 
     INVALID_COUNTRY_CODE = pn.NumberParseException.INVALID_COUNTRY_CODE
     NOT_A_NUMBER = pn.NumberParseException.NOT_A_NUMBER
@@ -42,7 +66,14 @@ class NumberParseErrorType(IntEnum):
 
 
 class PhoneNumberFormat(IntEnum):
-    """Enum for phone number formats."""
+    """Enum for phone number formats.
+    
+    Attributes:
+        E164: E.164 format.
+        INTERNATIONAL: International format.
+        NATIONAL: National format.
+        RFC3966: RFC 3966 format.
+    """
 
     E164 = pn.PhoneNumberFormat.E164
     INTERNATIONAL = pn.PhoneNumberFormat.INTERNATIONAL
@@ -51,7 +82,22 @@ class PhoneNumberFormat(IntEnum):
 
 
 class PhoneNumberType(IntEnum):
-    """Enum for phone number types."""
+    """Enum for phone number types.
+    
+    Attributes:
+        FIXED_LINE: Fixed line.
+        MOBILE: Mobile.
+        FIXED_LINE_OR_MOBILE: Fixed line or mobile.
+        TOLL_FREE: Toll free.
+        PREMIUM_RATE: Premium rate.
+        SHARED_COST: Shared cost.
+        VOIP: Voice over IP.
+        PERSONAL_NUMBER: Personal number.
+        PAGER: Pager.
+        UAN: Universal access number.
+        VOICEMAIL: Voicemail.
+        UNKNOWN: Unknown.
+    """
 
     FIXED_LINE = pn.PhoneNumberType.FIXED_LINE
     MOBILE = pn.PhoneNumberType.MOBILE
