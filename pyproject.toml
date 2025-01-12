@@ -28,9 +28,10 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/rykroon/digitz#readme"
-Issues = "https://github.com/rykroon/digitz/issues"
+Documentation = "https://digitz.rykroon.com"
 Source = "https://github.com/rykroon/digitz"
+Issues = "https://github.com/rykroon/digitz/issues"
+
 
 [tool.hatch.version]
 path = "src/digitz/__about__.py"
