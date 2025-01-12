@@ -70,7 +70,7 @@ class PhoneNumber(pn.PhoneNumber):
             keep_raw_input: Whether to keep the raw input of the phone number.
 
         Raises:
-            NumberParseException: If the phone number is cannot be parsed.
+            NumberParseException: If the phone number cannot be parsed.
 
         Returns:
             A new PhoneNumber object.
