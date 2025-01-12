@@ -1,5 +1,5 @@
 site_name: Digitz
-site_description: abc
+site_description: A Python library for parsing and validating phone numbers.
 site_url: https://digitz.rykroon.com/
 
 
@@ -47,7 +47,15 @@ watch:
 
 markdown_extensions:
   - admonition
-  # - mkautodoc
+
+  # https://squidfunk.github.io/mkdocs-material/reference/code-blocks/#configuration
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
 
 plugins:
 - mkdocstrings: # https://mkdocstrings.github.io/python/usage/configuration/general/

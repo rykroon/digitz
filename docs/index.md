@@ -10,7 +10,7 @@ pip install digitz
 
 
 ### Quick Example
-```
+```py
 >>> from digitz import PhoneNumber
 >>> num = PhoneNumber.parse("+1 (201) 555-0123")
 >>> num.region_code
