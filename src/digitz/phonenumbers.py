@@ -6,8 +6,7 @@ from functools import lru_cache, cached_property
 from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
 
 import phonenumbers as pn
-import pytz
-from pytz.tzinfo import BaseTzInfo
+from zoneinfo import ZoneInfo
 
 from digitz.enums import (
     CountryCodeSource,
@@ -244,11 +243,11 @@ class PhoneNumber(pn.PhoneNumber):
         return self.number_type == PhoneNumberType.VOICEMAIL
 
     @cached_property
-    def timezones(self) -> Tuple[BaseTzInfo, ...]:
+    def timezones(self) -> Tuple[ZoneInfo, ...]:
         """Returns the timezones of the phone number."""
         from phonenumbers.timezone import time_zones_for_number
 
-        return tuple([pytz.timezone(zone) for zone in time_zones_for_number(self)])
+        return tuple([ZoneInfo(zone) for zone in time_zones_for_number(self)])
 
     # ~~~ Match type methods ~~~
     def match(self, other: Union[str, pn.PhoneNumber], /) -> MatchType:

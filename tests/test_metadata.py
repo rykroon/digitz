@@ -1,9 +1,10 @@
+from zoneinfo import ZoneInfo
+
 import phonenumbers as pn
 from phonenumbers.timezone import time_zones_for_number
 from phonenumbers.carrier import name_for_number
 from phonenumbers.geocoder import country_name_for_number, description_for_number
 import pytest
-import pytz
 
 from digitz import PhoneNumber
 
@@ -17,7 +18,7 @@ def test_timezones(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
     assert num_dg.timezones == tuple(
-        [pytz.timezone(zone) for zone in time_zones_for_number(num_pn)]
+        [ZoneInfo(zone) for zone in time_zones_for_number(num_pn)]
     )
 
 

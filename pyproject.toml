@@ -32,7 +32,6 @@ classifiers = [
 ]
 dependencies = [
   "phonenumbers==8.13.*",
-  "pytz==2024.*"
 ]
 
 [project.urls]
