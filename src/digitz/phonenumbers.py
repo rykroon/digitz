@@ -108,19 +108,19 @@ class PhoneNumber(pn.PhoneNumber):
         Returns:
             An example phone number for the specified region and number type.
         """
-        pn_numobj = pn.example_number_for_type(region, number_type)
-        if pn_numobj is None:
+        numobj = pn.example_number_for_type(region, number_type)
+        if numobj is None:
             return None
 
         return cls(
-            country_code=pn_numobj.country_code or 0,
-            national_number=pn_numobj.national_number or 0,
-            extension=pn_numobj.extension,
-            italian_leading_zero=bool(pn_numobj.italian_leading_zero),
-            number_of_leading_zeros=pn_numobj.number_of_leading_zeros,
-            raw_input=pn_numobj.raw_input,
-            country_code_source=CountryCodeSource(pn_numobj.country_code_source),
-            preferred_domestic_carrier_code=pn_numobj.preferred_domestic_carrier_code,
+            country_code=numobj.country_code or 0,
+            national_number=numobj.national_number or 0,
+            extension=numobj.extension,
+            italian_leading_zero=bool(numobj.italian_leading_zero),
+            number_of_leading_zeros=numobj.number_of_leading_zeros,
+            raw_input=numobj.raw_input,
+            country_code_source=CountryCodeSource(numobj.country_code_source),
+            preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
 
     def __ne__(self, other: object) -> bool:
