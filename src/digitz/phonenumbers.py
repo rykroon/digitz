@@ -289,21 +289,42 @@ class PhoneNumber(pn.PhoneNumber):
     # ~~~ Carrier and country name methods ~~~
     @lru_cache
     def get_carrier_name(self, lang: str) -> str:
-        """Returns the carrier name of the phone number."""
+        """Returns the carrier name of the phone number.
+        
+        Parameters:
+            lang: The language to use.
+        
+        Returns:
+            The carrier name of the phone number.
+        """
         from phonenumbers.carrier import name_for_number
 
         return name_for_number(self, lang=lang)
 
     @lru_cache
     def get_country_name(self, lang: str) -> str:
-        """Returns the country name of the phone number."""
+        """Returns the country name of the phone number.
+        
+        Parameters:
+            lang: The language to use.
+            
+        Returns:
+            The country name of the phone number.
+        """
         from phonenumbers.geocoder import country_name_for_number
 
         return country_name_for_number(self, lang=lang)
 
     @lru_cache
     def get_description(self, lang: str) -> str:
-        """Returns the description of the phone number."""
+        """Returns the description of the phone number.
+        
+        Parameters:
+            lang: The language to use.
+        
+        Returns:
+            The description of the phone number.
+        """
         from phonenumbers.geocoder import description_for_number
 
         return description_for_number(self, lang=lang)
@@ -338,6 +359,7 @@ class PhoneNumber(pn.PhoneNumber):
         return self.format(PhoneNumberFormat.RFC3966)
 
     def to_dict(self) -> Dict[str, Any]:
+        """Returns a dictionary representation of the phone number."""
         return asdict(self)
 
     def to_tuple(
@@ -352,6 +374,7 @@ class PhoneNumber(pn.PhoneNumber):
         CountryCodeSource,
         Optional[str],
     ]:
+        """Returns a tuple representation of the phone number."""
         return astuple(self)
 
     def replace(
