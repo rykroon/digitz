@@ -1,4 +1,6 @@
 from dataclasses import FrozenInstanceError
+import pickle
+
 import phonenumbers as pn
 import pytest
 
@@ -130,6 +132,14 @@ def test_to_tuple(phonenumber: str) -> None:
         num_dg.country_code_source,
         num_dg.preferred_domestic_carrier_code,
     )
+
+@pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
+def test_pickling(phonenumber: str) -> None:
+    num_dg = PhoneNumber.parse(phonenumber)
+    num_dg_pickled = pickle.dumps(num_dg)
+    num_dg_unpickled = pickle.loads(num_dg_pickled)
+    assert num_dg == num_dg_unpickled
+
 
 
 def test_clear() -> None:

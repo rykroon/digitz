@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import asdict, astuple, dataclass, field
 from functools import lru_cache, cached_property
-from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Optional, Tuple, Type, TypeAlias, TypeVar, Union
 
 import phonenumbers as pn
 from zoneinfo import ZoneInfo
@@ -15,6 +15,17 @@ from digitz.enums import (
     PhoneNumberFormat,
     PhoneNumberType,
 )
+
+PhoneNumberTuple: TypeAlias = Tuple[
+    int,
+    int,
+    Optional[str],
+    bool,
+    Optional[int],
+    Optional[str],
+    CountryCodeSource,
+    Optional[str],
+]
 
 
 class _MISSING_TYPE:
@@ -121,6 +132,12 @@ class PhoneNumber(pn.PhoneNumber):
             country_code_source=CountryCodeSource(numobj.country_code_source),
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
+
+    def __getstate__(self) -> PhoneNumberTuple:
+        return self.to_tuple()
+
+    def __setstate__(self, state: PhoneNumberTuple) -> None:
+        self.__init__(*state)
 
     def __ne__(self, other: object) -> bool:
         return not self == other
@@ -289,10 +306,10 @@ class PhoneNumber(pn.PhoneNumber):
     @lru_cache
     def get_carrier_name(self, lang: str) -> str:
         """Returns the carrier name of the phone number.
-        
+
         Parameters:
             lang: The language to use.
-        
+
         Returns:
             The carrier name of the phone number.
         """
@@ -303,10 +320,10 @@ class PhoneNumber(pn.PhoneNumber):
     @lru_cache
     def get_country_name(self, lang: str) -> str:
         """Returns the country name of the phone number.
-        
+
         Parameters:
             lang: The language to use.
-            
+
         Returns:
             The country name of the phone number.
         """
@@ -317,10 +334,10 @@ class PhoneNumber(pn.PhoneNumber):
     @lru_cache
     def get_description(self, lang: str) -> str:
         """Returns the description of the phone number.
-        
+
         Parameters:
             lang: The language to use.
-        
+
         Returns:
             The description of the phone number.
         """
@@ -361,18 +378,7 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns a dictionary representation of the phone number."""
         return asdict(self)
 
-    def to_tuple(
-        self,
-    ) -> Tuple[
-        int,
-        int,
-        Optional[str],
-        bool,
-        Optional[int],
-        Optional[str],
-        CountryCodeSource,
-        Optional[str],
-    ]:
+    def to_tuple(self) -> PhoneNumberTuple:
         """Returns a tuple representation of the phone number."""
         return astuple(self)
 
