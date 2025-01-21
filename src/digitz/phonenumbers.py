@@ -152,15 +152,30 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns the length of the national destination code."""
         return pn.length_of_national_destination_code(self)
 
+    @property
+    def ndc_length(self) -> int:
+        """An alias for the national_destination_code_length property."""
+        return self.national_destination_code_length
+
     @cached_property
     def national_significant_number(self) -> str:
         """Returns the national significant number."""
         return pn.national_significant_number(self)
 
     @property
+    def nsn(self) -> str:
+        """An alias for the national_significant_number property."""
+        return self.national_significant_number
+
+    @property
     def national_destination_code(self) -> str:
         """Returns the national destination code."""
         return self.national_significant_number[: self.national_destination_code_length]
+
+    @property
+    def ndc(self) -> str:
+        """An alias for the national_destination_code property."""
+        return self.national_destination_code
 
     @property
     def subscriber_number(self) -> str:

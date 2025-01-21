@@ -14,7 +14,11 @@ INVALID_NUMBERS = create_number_list(REGIONS, PT.UNKNOWN)
 def test_national_significant_number(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
-    assert num_dg.national_significant_number == pn.national_significant_number(num_pn)
+    assert (
+        num_dg.nsn
+        == num_dg.national_significant_number
+        == pn.national_significant_number(num_pn)
+    )
 
 
 @pytest.mark.parametrize("phonenumber", PHONE_NUMBERS)
@@ -22,7 +26,8 @@ def test_national_destination_code_length(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
     assert (
-        num_dg.national_destination_code_length
+        num_dg.ndc_length
+        == num_dg.national_destination_code_length
         == pn.length_of_national_destination_code(num_pn)
     )
 
@@ -32,7 +37,8 @@ def test_national_destination_code(phonenumber: str) -> None:
     num_dg = PhoneNumber.parse(phonenumber)
     num_pn = pn.parse(phonenumber)
     assert (
-        num_dg.national_destination_code
+        num_dg.ndc
+        == num_dg.national_destination_code
         == pn.national_significant_number(num_pn)[
             : pn.length_of_national_destination_code(num_pn)
         ]
