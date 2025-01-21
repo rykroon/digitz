@@ -2,6 +2,7 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/digitz.svg)](https://pypi.org/project/digitz)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/digitz.svg)](https://pypi.org/project/digitz)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/digitz.svg)](https://pypi.org/project/digitz)
 
 -----
 
