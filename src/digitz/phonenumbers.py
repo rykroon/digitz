@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import asdict, astuple, dataclass, field
 from functools import lru_cache, cached_property
-from typing import Any, Dict, Optional, Tuple, Type, TypeAlias, TypeVar, Union
+from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
 
 import phonenumbers as pn
 from zoneinfo import ZoneInfo
@@ -16,7 +16,7 @@ from digitz.enums import (
     PhoneNumberType,
 )
 
-PhoneNumberTuple: TypeAlias = Tuple[
+PhoneNumberTuple = Tuple[
     int,
     int,
     Optional[str],
