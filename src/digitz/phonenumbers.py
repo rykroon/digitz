@@ -133,11 +133,11 @@ class PhoneNumber(pn.PhoneNumber):
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
 
-    def __getstate__(self) -> PhoneNumberTuple:
-        return self.to_tuple()
+    def __getstate__(self) -> Dict[str, Any]:
+        return self.to_dict()
 
-    def __setstate__(self, state: PhoneNumberTuple) -> None:
-        self.__init__(*state)
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
 
     def __ne__(self, other: object) -> bool:
         return not self == other
