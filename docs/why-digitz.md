@@ -113,7 +113,7 @@ False
 ___
 
 ## Retrieving the National Destination Code and Subscriber Number.
-In `phonenumbers` it is not explicitely clear how to retrieve the National Destination Code (NDC) (Referred to in some countries as the Area Code) and the Subscriber Number (The digits after the NDC). From looking at the [source code](https://github.com/daviddrysdale/python-phonenumbers/blob/d7fe6c6f1e416797f439beb2ae2bb365360bf340/python/phonenumbers/phonenumberutil.py#L846), it says you need to call a function to get the length of the NDC and split the national significant number to get the NDC and Subscriber Number. This is quite a hassle, especially if you are new to the library and just want to get the area code of a number.
+In `phonenumbers` it is not explicitely clear how to retrieve the National Destination Code (NDC) (Referred to in some countries as the Area Code) and the Subscriber Number (the digits after the NDC). From looking at the [source code](https://github.com/daviddrysdale/python-phonenumbers/blob/d7fe6c6f1e416797f439beb2ae2bb365360bf340/python/phonenumbers/phonenumberutil.py#L846), it says you need to get the length of the NDC and then split the national significant number to get the NDC and subscriber number. This is quite a hassle, especially if you are new to the library and just want to get the area code of a number.
 
 ```py
 >>> import phonenumbers as pn
@@ -128,12 +128,10 @@ In `phonenumbers` it is not explicitely clear how to retrieve the National Desti
 >>> ndc_length
 3
 
->>> # Getting the NDC.
->>> nsn[:ndc_length]
+>>> nsn[:ndc_length]  # ndc
 '800'
 
->>> # Getting the subscriber number.
->>> nsn[ndc_length:]
+>>> nsn[ndc_length:]  # subscriber number
 '2345678'
 ```
 
@@ -152,8 +150,3 @@ With `digitz`, getting the NDC and Subscriber Number is a breeze.
 >>> n.subscriber_number
 '2345678'
 ```
-
-## Other Shortcuts and Niceties
-- String formatting
-- to_dict and to_tuple
-- \__str__ is E164 formatted for easy integration into ORMs.
