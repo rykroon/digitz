@@ -23,7 +23,7 @@ PhoneNumberTuple = Tuple[
     bool,
     Optional[int],
     Optional[str],
-    CountryCodeSource,
+    Union[CountryCodeSource, int],
     Optional[str],
 ]
 
@@ -146,16 +146,18 @@ class PhoneNumber(pn.PhoneNumber):
         )
 
     def __setstate__(self, state: PhoneNumberTuple) -> None:
-        self.__dict__.update({
-            "country_code": state[0],
-            "national_number": state[1],
-            "extension": state[2],
-            "italian_leading_zero": state[3],
-            "number_of_leading_zeros": state[4],
-            "raw_input": state[5],
-            "country_code_source": CountryCodeSource(state[6]),
-            "preferred_domestic_carrier_code": state[7],
-        })
+        self.__dict__.update(
+            {
+                "country_code": state[0],
+                "national_number": state[1],
+                "extension": state[2],
+                "italian_leading_zero": state[3],
+                "number_of_leading_zeros": state[4],
+                "raw_input": state[5],
+                "country_code_source": CountryCodeSource(state[6]),
+                "preferred_domestic_carrier_code": state[7],
+            }
+        )
 
     def __ne__(self, other: object) -> bool:
         return not self == other
