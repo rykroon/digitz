@@ -7,11 +7,15 @@
 
 -----
 
-**Table of Contents**
+## What is it?
+
+digitz is a phone number parsing, validating, and formatting library built on top of [python-phonenumbers](https://github.com/daviddrysdale/python-phonenumbers). The goal of digitz is to bring a modern Python developer experience to working with phone numbers.
+
+## Table of Contents
 
 - [Getting Started](#getting-started)
+- [Documentation](#documentation)
 - [Running the tests](#running-the-tests)
-- [Built With](built-with)
 - [License](#license)
 - [Example Usage](#example-usage)
 
@@ -24,18 +28,16 @@ Install digitz using pip.
 pip install digitz
 ```
 
+## Documentation
+
+The official documentation can be found [here](https://digitz.rykroon.com)
+
 ## Running the tests
 
-The easiest way to run the tests is by using Hatch. You can add the `--cover` argument to see the code coverage. You can add the `--all` argument to run the tests for all supported versions of python.
+It is recommended to run the tests using hatch.
 ```console
-> hatch test
-> hatch test --cover
-> hatch test --all
+hatch test
 ```
-
-## Built With
-- [Hatch](https://hatch.pypa.io/latest/) - Python project manager.
-- [mkdocstrings](https://mkdocstrings.github.io/) - Static Site Generator for documentation.
 
 ## License
 
@@ -43,6 +45,7 @@ The easiest way to run the tests is by using Hatch. You can add the `--cover` ar
 
 
 ## Example Usage
+
 ```python
 >>> from digitz import PhoneNumber
 
