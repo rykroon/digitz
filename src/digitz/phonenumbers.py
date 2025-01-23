@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2023-present Ryan Kroon <rykroon.tech@gmail.com>
 #
 # SPDX-License-Identifier: MIT
-from dataclasses import asdict, astuple, dataclass, field
+from dataclasses import dataclass, field
 from functools import lru_cache, cached_property
 from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
 
@@ -133,11 +133,29 @@ class PhoneNumber(pn.PhoneNumber):
             preferred_domestic_carrier_code=numobj.preferred_domestic_carrier_code,
         )
 
-    def __getstate__(self) -> Dict[str, Any]:
-        return self.to_dict()
+    def __getstate__(self) -> PhoneNumberTuple:
+        return (
+            self.country_code,
+            self.national_number,
+            self.extension,
+            self.italian_leading_zero,
+            self.number_of_leading_zeros,
+            self.raw_input,
+            self.country_code_source.value,
+            self.preferred_domestic_carrier_code,
+        )
 
-    def __setstate__(self, state: Dict[str, Any]) -> None:
-        self.__dict__.update(state)
+    def __setstate__(self, state: PhoneNumberTuple) -> None:
+        self.__dict__.update({
+            "country_code": state[0],
+            "national_number": state[1],
+            "extension": state[2],
+            "italian_leading_zero": state[3],
+            "number_of_leading_zeros": state[4],
+            "raw_input": state[5],
+            "country_code_source": CountryCodeSource(state[6]),
+            "preferred_domestic_carrier_code": state[7],
+        })
 
     def __ne__(self, other: object) -> bool:
         return not self == other
@@ -391,11 +409,29 @@ class PhoneNumber(pn.PhoneNumber):
 
     def to_dict(self) -> Dict[str, Any]:
         """Returns a dictionary representation of the phone number."""
-        return asdict(self)
+        return {
+            "country_code": self.country_code,
+            "national_number": self.national_number,
+            "extension": self.extension,
+            "italian_leading_zero": self.italian_leading_zero,
+            "number_of_leading_zeros": self.number_of_leading_zeros,
+            "raw_input": self.raw_input,
+            "country_code_source": self.country_code_source,
+            "preferred_domestic_carrier_code": self.preferred_domestic_carrier_code,
+        }
 
     def to_tuple(self) -> PhoneNumberTuple:
         """Returns a tuple representation of the phone number."""
-        return astuple(self)
+        return (
+            self.country_code,
+            self.national_number,
+            self.extension,
+            self.italian_leading_zero,
+            self.number_of_leading_zeros,
+            self.raw_input,
+            self.country_code_source,
+            self.preferred_domestic_carrier_code,
+        )
 
     def replace(
         self: Self,
