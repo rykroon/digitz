@@ -25,6 +25,6 @@ jobs:
       run: |
         hatch build
 
-    - name: Upload package
+    - name: Publish package
       run: |
-        hatch upload
+        hatch publish
