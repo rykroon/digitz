@@ -27,4 +27,4 @@ jobs:
 
     - name: Publish package
       run: |
-        hatch publish
+        hatch publish --no-prompt
