@@ -1,18 +1,20 @@
 # Digitz
 
-Python phone numbers made easy.
+`digitz` is a phone number parsing, validating, and formatting library built on top of [python-phonenumbers](https://github.com/daviddrysdale/python-phonenumbers). The goal of digitz is to bring a modern Python developer experience to working with phone numbers.
 
 
 ### Installation
-```
+Install digitz using pip.
+```console
 pip install digitz
 ```
-
 
 ### Quick Example
 ```py
 >>> from digitz import PhoneNumber
+
 >>> num = PhoneNumber.parse("+1 (201) 555-0123")
+
 >>> num.region_code
 'US'
 

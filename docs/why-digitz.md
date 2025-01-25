@@ -1,9 +1,8 @@
 # Why Digitz?
 
+The [phonenumbers](https://pypi.org/project/phonenumbers/) library for Python has long been a trusted solution for phone number validation, formatting, and parsing. While its accuracy and reliability are unquestionable, the library has been slow to embrace modern Python features, often feeling like it's stuck in the past.
 
-The [phonenumbers](https://pypi.org/project/phonenumbers/) library for Python has long been a trusted solution for phone number validation, formatting, and parsing, built on top of [Google's libphonenumber](https://github.com/google/libphonenumber). While its accuracy and reliability are unquestionable, the library has been slow to embrace modern Python practices, often feeling like it's stuck in the past.
-
-`digitz` is a fresh take on phone number handling, designed to bring modern Python features and best practices to the world of phone number processing. If you've ever struggled with the verbose syntax or outdated API design of the phonenumbers library, `digitz` is here to change that.
+`digitz` is a fresh take on phone number handling, designed to bring modern Python features to the world of phone number processing. If you've ever struggled with the verbose syntax or outdated API design of the phonenumbers library, `digitz` is here to change that.
 
 Below are some examples on how digitz improves the developer experience.
 ___
@@ -12,7 +11,7 @@ ___
 
 In the `phonenumbers` library there are several classes that behave like enums, but are not actually traditional python enums. They are just classes with class attributes. See the [PhoneNumberType](https://github.com/daviddrysdale/python-phonenumbers/blob/d7fe6c6f1e416797f439beb2ae2bb365360bf340/python/phonenumbers/phonenumberutil.py#L458) class as an example.
 
-In the below code block, `pn.number_type(n)` returns the integer `3`. This means nothing to the developer. You then have to compare the result to the appropriate "enum" to know what the number type is.
+In the below code block, `pn.number_type(n)` returns the value `3`. This result does not express any meaning and it is left to the developer to figure out which enum value is associated with the value 3.
 
 ```py
 >>> import  phonenumbers as pn
@@ -28,7 +27,6 @@ In the below code block, `pn.number_type(n)` returns the integer `3`. This means
 >>> pn.number_type(n) == pn.PhoneNumberType.TOLL_FREE
 True
 ```
-
 
 In `digitz`, the PhoneNumber object has a `number_type` property which will return an actual enum. This is much more descriptive than a simple integer. Just like any other python enum you can check the `name` and `value` attributes for more information.
 
@@ -47,37 +45,24 @@ In `digitz`, the PhoneNumber object has a `number_type` property which will retu
 3
 ```
 
-
-
-But `digitz` doesn't stop there. If you want to know if a phone number is toll free, then just simply check the `is_toll_free` property. This allows you to avoid comparing against enum values all together. There are additional properties for all of the other phone number types.
+But `digitz` doesn't stop there. If you want to know if a phone number is toll free, then just simply check the `is_toll_free` property. There are additional properties for all of the other phone number types.
 
 ```py
 >>> n.is_toll_free
 True
 ```
-
-And in case you were wondering, yes, both the `phonenumbers` and `digitz` enums are compatible with each other as they equal the same integer value.
-
-```py
->>> import phonenumbers as pn
-
->>> from digitz.enums import PhoneNumberType
-
->>> pn.PhoneNumberType.TOLL_FREE == PhoneNumberType.TOLL_FREE
-True
-```
 ___
 
-## Properties over functions.
+## Concise properties over verbose functions.
 
-In `phonenumbers`, aside from the core properties that make a PhoneNumber object, all other information regarding a phone number must be retrieved by calling the appropriate function and passing in the PhoneNumber object. Additionally, many of these functions are overly verbose.
+In `phonenumbers`, aside from the core properties that make up a `PhoneNumber` object, all other information regarding a phone number must be retrieved by calling the appropriate function and passing in the `PhoneNumber` object. Additionally, many of these functions are overly verbose.
 
 ```py
 >>> import phonenumbers as pn
 
 >>> n = pn.parse("+18002345678")
 
->>> pn.region_code_for_number(n)
+>>> n.region_code_for_number(n)
 'US'
 
 >>> pn.is_valid_number(n)
@@ -91,7 +76,7 @@ False
 
 ```
 
-With `digitz`, most of the additional information can be accessed as a cached property or method on the PhoneNumber object.
+With `digitz`, the additional information can be accessed as cached properties or methods on the PhoneNumber object. Aliases are available for any properties whose name is too lengthy.
 
 ```py
 >>> from digitz import PhoneNumber
@@ -109,11 +94,22 @@ False
 
 >>> n.national_significant_number
 '8002345678'
+
+>>> pn.nsn  # an alias for national_significant_number
+'8002345678'
 ```
 ___
 
-## Retrieving the National Destination Code and Subscriber Number.
-In `phonenumbers` it is not explicitely clear how to retrieve the National Destination Code (NDC) (Referred to in some countries as the Area Code) and the Subscriber Number (the digits after the NDC). From looking at the [source code](https://github.com/daviddrysdale/python-phonenumbers/blob/d7fe6c6f1e416797f439beb2ae2bb365360bf340/python/phonenumbers/phonenumberutil.py#L846), it says you need to get the length of the NDC and then split the national significant number to get the NDC and subscriber number. This is quite a hassle, especially if you are new to the library and just want to get the area code of a number.
+
+## Making things easier wherever possible.
+
+
+### Retrieving the National Destination Code and Subscriber Number.
+The `phonenumbers` library puts you through a lot of obstacles to retrieve the National Destination Code (NDC) (Referred to in some countries as the Area Code) as well as the Subscriber Number (the digits after the NDC).
+
+You have to call two functions, one to get the national significant number and another to get the length of the national destination code. You then have to use string slicing to get the national destination code and subscriber number.
+
+This is quite a hassle, especially if you are new to the library and just want to get the area code of a number.
 
 ```py
 >>> import phonenumbers as pn
@@ -135,7 +131,7 @@ In `phonenumbers` it is not explicitely clear how to retrieve the National Desti
 '2345678'
 ```
 
-With `digitz`, getting the NDC and Subscriber Number is a breeze.
+With `digitz`, getting the NDC and Subscriber Number is a very simple task.
 ```py
 >>> from digitz import PhoneNumber
 

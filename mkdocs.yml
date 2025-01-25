@@ -37,6 +37,7 @@ repo_url: https://github.com/rykroon/digitz/
 nav:
   - Introduction: index.md
   - Why Digitz?: why-digitz.md
+  - Walkthrough: walkthrough.md
   - API Reference:
     - Phone Numbers: apiref/phonenumbers.md
     - Enums: apiref/enums.md
