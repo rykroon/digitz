@@ -47,6 +47,3 @@ The `PhoneNumber` class includes a `replace()` method, which allows you to creat
 
 ## Seamless E.164 String Conversion
 The `__str__` method of the PhoneNumber class returns the phone number as an E.164-formatted string. This design ensures seamless integration with ORMs, allowing phone number objects to be automatically converted into strings and stored in databases in the standardized E.164 format, promoting consistency and compatibility across systems.
-
-
-- This is a test
