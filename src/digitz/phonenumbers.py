@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass, field
 from functools import lru_cache, cached_property
-from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Type, TypeVar
 
 import phonenumbers as pn
 from zoneinfo import ZoneInfo
@@ -16,15 +16,15 @@ from digitz.enums import (
     PhoneNumberType,
 )
 
-PhoneNumberTuple = Tuple[
+PhoneNumberTuple = tuple[
     int,
     int,
-    Optional[str],
+    str | None,
     bool,
-    Optional[int],
-    Optional[str],
-    Union[CountryCodeSource, int],
-    Optional[str],
+    int | None,
+    str | None,
+    CountryCodeSource | int,
+    str | None,
 ]
 
 
@@ -56,12 +56,12 @@ class PhoneNumber(pn.PhoneNumber):
 
     country_code: int
     national_number: int
-    extension: Optional[str] = None
+    extension: str | None = None
     italian_leading_zero: bool = False
-    number_of_leading_zeros: Optional[int] = None
-    raw_input: Optional[str] = field(default=None, repr=False)
+    number_of_leading_zeros: int | None = None
+    raw_input: str | None = field(default=None, repr=False)
     country_code_source: CountryCodeSource = CountryCodeSource.UNSPECIFIED
-    preferred_domestic_carrier_code: Optional[str] = None
+    preferred_domestic_carrier_code: str | None = None
 
     @classmethod
     def parse(
@@ -69,7 +69,7 @@ class PhoneNumber(pn.PhoneNumber):
         number: str,
         /,
         *,
-        region: Optional[str] = None,
+        region: str | None = None,
         keep_raw_input: bool = False,
     ) -> Self:
         """Attempts to parse a string and return a new PhoneNumber object.
@@ -108,7 +108,7 @@ class PhoneNumber(pn.PhoneNumber):
         cls: Type[Self],
         region: str,
         number_type: PhoneNumberType = PhoneNumberType.FIXED_LINE,
-    ) -> Optional[Self]:
+    ) -> Self | None:
         """Returns an example phone number for the specified region and number type.
 
         Parameters:
@@ -204,7 +204,7 @@ class PhoneNumber(pn.PhoneNumber):
 
     # ~~~ region related properties ~~~
     @cached_property
-    def region_code(self) -> Optional[str]:
+    def region_code(self) -> str | None:
         """Returns the region code of the phone number."""
         return pn.region_code_for_number(self)
 
@@ -295,14 +295,14 @@ class PhoneNumber(pn.PhoneNumber):
         return self.number_type == PhoneNumberType.VOICEMAIL
 
     @cached_property
-    def timezones(self) -> Tuple[ZoneInfo, ...]:
+    def timezones(self) -> tuple[ZoneInfo, ...]:
         """Returns the timezones of the phone number."""
         from phonenumbers.timezone import time_zones_for_number
 
         return tuple([ZoneInfo(zone) for zone in time_zones_for_number(self)])
 
     # ~~~ Match type methods ~~~
-    def match(self, other: Union[str, pn.PhoneNumber], /) -> MatchType:
+    def match(self, other: str | pn.PhoneNumber, /) -> MatchType:
         """Returns the match type of the phone number.
 
         Parameters:
@@ -313,23 +313,23 @@ class PhoneNumber(pn.PhoneNumber):
         """
         return MatchType(pn.is_number_match(self, other))
 
-    def is_short_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+    def is_short_nsn_match(self, other: str | pn.PhoneNumber, /) -> bool:
         """Returns True if the other phone number is a short NSN match."""
         return self.match(other) == MatchType.SHORT_NSN_MATCH
 
-    def is_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+    def is_nsn_match(self, other: str | pn.PhoneNumber, /) -> bool:
         """Returns True if the other phone number is a NSN match."""
         return self.match(other) == MatchType.NSN_MATCH
 
-    def is_exact_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+    def is_exact_match(self, other: str | pn.PhoneNumber, /) -> bool:
         """Returns True if the other phone number is an exact match."""
         return self.match(other) == MatchType.EXACT_MATCH
 
-    def is_any_nsn_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+    def is_any_nsn_match(self, other: str | pn.PhoneNumber, /) -> bool:
         """Returns True if the other phone number is any NSN match."""
         return self.match(other) in (MatchType.SHORT_NSN_MATCH, MatchType.NSN_MATCH)
 
-    def is_any_match(self, other: Union[str, pn.PhoneNumber], /) -> bool:
+    def is_any_match(self, other: str | pn.PhoneNumber, /) -> bool:
         """Returns True if the other phone number is any match."""
         return self.match(other) in (
             MatchType.EXACT_MATCH,
@@ -409,7 +409,7 @@ class PhoneNumber(pn.PhoneNumber):
         """Returns the RFC3966 representation of the phone number."""
         return self.format(PhoneNumberFormat.RFC3966)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Returns a dictionary representation of the phone number."""
         return {
             "country_code": self.country_code,
@@ -438,11 +438,11 @@ class PhoneNumber(pn.PhoneNumber):
     def replace(
         self: Self,
         *,
-        country_code: Union[int, _MISSING_TYPE] = MISSING,
-        national_number: Union[int, _MISSING_TYPE] = MISSING,
-        extension: Union[Optional[str], _MISSING_TYPE] = MISSING,
-        italian_leading_zero: Union[bool, _MISSING_TYPE] = MISSING,
-        number_of_leading_zeros: Union[Optional[int], _MISSING_TYPE] = MISSING,
+        country_code: int | _MISSING_TYPE = MISSING,
+        national_number: int | _MISSING_TYPE = MISSING,
+        extension: str | None | _MISSING_TYPE = MISSING,
+        italian_leading_zero: bool | _MISSING_TYPE = MISSING,
+        number_of_leading_zeros: int | None | _MISSING_TYPE = MISSING,
     ) -> Self:
         """Returns a new phone number with the specified attributes replaced.
 
