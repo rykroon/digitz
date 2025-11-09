@@ -7,7 +7,7 @@ name = "digitz"
 dynamic = ["version"]
 description = 'Python phone numbers made easy.'
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = [
   "phone",
@@ -23,15 +23,15 @@ authors = [
 ]
 classifiers = [
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
 dependencies = [
-  "phonenumbers==8.13.*",
+  "phonenumbers==9.*",
 ]
 
 [project.urls]
@@ -44,7 +44,7 @@ Issues = "https://github.com/rykroon/digitz/issues"
 path = "src/digitz/__about__.py"
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
+python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
 [tool.hatch.envs.types]
 extra-dependencies = [
